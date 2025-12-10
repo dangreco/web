@@ -1,0 +1,17 @@
+---
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: "3"
+
+tasks:
+  check:
+    desc: Check YAML files
+    silent: true
+    cmds:
+      - yamllint --strict .
+      - yamlfmt -lint .
+
+  fix:
+    desc: Fix YAML files
+    silent: true
+    cmds:
+      - yamlfmt .

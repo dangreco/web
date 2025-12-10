@@ -1,0 +1,9 @@
+/.zed
+/.pre-commit-config.yaml
+/.envrc
+/.direnv
+
+
+_site
+_cache
+.env

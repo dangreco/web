@@ -1,0 +1,29 @@
+---
+# yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
+# yamllint disable rule:line-length
+# yamllint disable rule:comments
+name: Nix
+on:
+  pull_request:
+    paths:
+      - "flake.nix"
+      - "flake.lock"
+env:
+  HUSKY: 0
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+
+      - name: Install Nix
+        uses: DeterminateSystems/determinate-nix-action@9596b92e70cbf68a494a2b0273cb5b680184f5fc # v3.13.1
+
+      - name: Setup Nix cache
+        uses: DeterminateSystems/magic-nix-cache-action@565684385bcd71bad329742eefe8d12f2e765b39 # v13
+        with:
+          use-flakehub: false
+
+      - name: Run Nix flake check
+        run: nix flake check --all-systems --no-build

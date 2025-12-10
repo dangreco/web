@@ -1,0 +1,39 @@
+---
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: "3"
+
+tasks:
+  check:
+    desc: Check files
+    silent: true
+    cmds:
+      - deno check src/ _config.ts
+      - deno lint src/ _config.ts
+      - deno fmt --check src/ _config.ts
+
+  fix:
+    desc: Fix files
+    silent: true
+    cmds:
+      - deno lint --fix src/ _config.ts
+      - deno fmt src/ _config.ts
+
+  serve:
+    desc: Start development server
+    silent: true
+    cmds:
+      - deno task serve
+
+  clean:
+    desc: Clean build artifacts
+    silent: true
+    cmds:
+      - rm -rf _site
+
+  build:
+    desc: Build the project
+    silent: true
+    deps:
+      - clean
+    cmds:
+      - deno task build

@@ -1,0 +1,8 @@
+---
+extends: default
+ignore:
+  - .venv/
+  - .pre-commit-config.yaml
+rules:
+  truthy:
+    check-keys: false

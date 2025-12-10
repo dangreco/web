@@ -1,0 +1,46 @@
+---
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: "3"
+
+includes:
+  yaml: tasks/yaml.yml
+  deno: tasks/deno.yml
+
+tasks:
+  default:
+    desc: List tasks
+    silent: true
+    cmds:
+      - task --list
+
+  clean:
+    desc: Clean build artifacts
+    silent: true
+    cmds:
+      - task deno:clean
+
+  check:
+    desc: Run all checks
+    silent: true
+    deps:
+      - yaml:check
+      - deno:check
+
+  fix:
+    desc: Fix all issues
+    silent: true
+    deps:
+      - yaml:fix
+      - deno:fix
+
+  serve:
+    desc: Start development server
+    silent: true
+    deps:
+      - deno:serve
+
+  build:
+    desc: Build the project
+    silent: true
+    deps:
+      - deno:build
