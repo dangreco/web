@@ -102,7 +102,7 @@
               '';
             };
 
-            ci = {
+            ci = pkgs.mkShell {
               packages = with pkgs; [
                 go-task
                 yamlfmt
