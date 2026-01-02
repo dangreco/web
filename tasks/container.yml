@@ -1,0 +1,32 @@
+---
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+# yamllint disable rule:line-length
+# yamllint disable rule:comments
+version: "3"
+
+tasks:
+  default:
+    desc: List tasks
+    silent: true
+    cmds:
+      - task -t tasks/container.yml --list
+
+  clean:
+    desc: Clean build artifacts
+    silent: true
+    deps: []
+    cmds: []
+
+  build:
+    desc: Build the project
+    silent: true
+    deps: []
+    cmds:
+      - '{{ .CONTAINER_RUNTIME | default "podman" }} build -t {{ .CONTAINER_ORGANIZATION | default "dangreco" }}/{{ .CONTAINER_IMAGE | default "web" }}:latest .'
+
+  run:
+    desc: Run the project container
+    silent: true
+    deps: []
+    cmds:
+      - '{{ .CONTAINER_RUNTIME | default "podman" }} run --rm -p 3000:80 {{ .CONTAINER_ORGANIZATION | default "dangreco" }}/{{ .CONTAINER_IMAGE | default "web" }}:latest'

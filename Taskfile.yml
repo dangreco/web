@@ -1,0 +1,61 @@
+---
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+# yamllint disable rule:line-length
+# yamllint disable rule:comments
+version: "3"
+
+includes:
+  yaml: ./tasks/yaml.yml
+  deno: ./tasks/deno.yml
+  container: ./tasks/container.yml
+
+tasks:
+  default:
+    desc: List tasks
+    silent: true
+    cmds:
+      - task --list
+
+  clean:
+    desc: Clean the project
+    silent: true
+    deps:
+      - deno:clean
+    cmds: []
+
+  build:
+    desc: Build the project
+    silent: true
+    deps:
+      - deno:build
+    cmds: []
+
+  serve:
+    desc: Serve the project
+    silent: true
+    deps:
+      - deno:serve
+    cmds: []
+
+  test:
+    desc: Test the project
+    silent: true
+    deps:
+      - deno:test
+    cmds: []
+
+  check:
+    desc: Check for linting/formatting errors
+    silent: true
+    deps:
+      - yaml:check
+      - deno:check
+    cmds: []
+
+  fix:
+    desc: Fix linting/formatting errors
+    silent: true
+    deps:
+      - yaml:fix
+      - deno:fix
+    cmds: []

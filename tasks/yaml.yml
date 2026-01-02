@@ -1,0 +1,25 @@
+---
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+# yamllint disable rule:line-length
+# yamllint disable rule:comments
+version: "3"
+
+tasks:
+  default:
+    desc: List tasks
+    silent: true
+    cmds:
+      - task -t tasks/yaml.yml --list
+
+  check:
+    desc: Check YAML files
+    silent: true
+    cmds:
+      - yamllint --strict .
+      - yamlfmt -lint .
+
+  fix:
+    desc: Fix YAML files
+    silent: true
+    cmds:
+      - yamlfmt -q .

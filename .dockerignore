@@ -1,0 +1,11 @@
+.direnv
+.git
+.github
+.zed
+_build
+.envrc
+.gitignore
+.pre-commit-config.yaml
+.yamlfmt.yml
+.yamllint.yml
+Dockerfile
