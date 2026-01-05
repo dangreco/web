@@ -7,6 +7,7 @@ import robots from "lume/plugins/robots.ts";
 const site = lume({
   src: "./src",
   dest: "./_build",
+  location: new URL("https://dangre.co"),
 });
 
 site.use(tailwindcss());
