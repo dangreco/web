@@ -6,7 +6,9 @@
   >
     {{ await comp.layout.header() }}
     <main class="overflow-x-hidden flex-grow">
-      {{ content }}
+      <article class="prose mx-auto dark:prose-invert">
+        {{ content }}
+      </article>
     </main>
     {{ await comp.layout.footer() }}
   </body>
