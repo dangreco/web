@@ -7,8 +7,8 @@ import extractDate from "lume/plugins/extract_date.ts";
 import readingInfo from "lume/plugins/reading_info.ts";
 import date from "lume/plugins/date.ts";
 import shikiji from "https://deno.land/x/lume_shikiji/mod.ts";
-import { enCA } from "npm:date-fns/locale/en-CA@4.1.0";
-import { frCA } from "npm:date-fns/locale/fr-CA@4.1.0";
+import { enCA } from "npm:date-fns@4.1.0/locale/en-CA";
+import { frCA } from "npm:date-fns@4.1.0/locale/fr-CA";
 
 const site = lume({
   src: "./src",
