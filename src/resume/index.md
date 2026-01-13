@@ -26,18 +26,18 @@ GPG signature and SHA256 checksum provided.
 
 Import my GPG public key:
 
-```bash
+```bash {data-line-numbers="false"}
 curl https://github.com/dangreco.gpg | gpg --import
 ```
 
 Then verify the signature:
 
-```bash
+```bash {data-line-numbers="false"}
 gpg --verify resume.en.pdf.asc resume.en.pdf
 ```
 
 ### 2. SHA256 Checksum Verification
 
-```bash
+```bash {data-line-numbers="false"}
 sha256sum -c checksums.txt
 ```

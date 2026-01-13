@@ -5,4 +5,24 @@
   <meta name="supported-color-schemes" content="light dark">
   <link rel="stylesheet" href="/styles.css" />
   <title>{{ title }}</title>
+  <script>
+    function setTheme() {
+    const userPrefersDark = window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const theme = userPrefersDark ? "dark" : "light";
+
+    document.body && document.body.setAttribute("data-color", theme);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", setTheme);
+  } else {
+    setTheme();
+  }
+
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener(
+    "change",
+    setTheme,
+  );
+  </script>
 </head>
