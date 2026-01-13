@@ -1,0 +1,20 @@
+<h1>Blog</h1>
+<ul class="list-none p-0 flex flex-col gap-4">
+  {{ for page of search.pages("post") }}
+    <li class="m-0! p-0!">
+      <a
+        href="{{ page.url }}"
+        class="block p-4 bg-neutral-100 dark:bg-neutral-800 rounded-lg no-underline flex flex-col hover:bg-neutral-200 dark:hover:bg-neutral-700 transition"
+      >
+        <p class="text-xl m-0!">{{ page.title }}</p>
+        <div class="text-sm text-neutral-500 mt-1">
+          <time>{{ page.date |> date }}</time>
+          •
+          <span>
+            {{ page.readingInfo.minutes }} min
+          </span>
+        </div>
+      </a>
+    </li>
+  {{ /for }}
+</ul>
