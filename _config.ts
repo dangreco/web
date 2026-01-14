@@ -7,8 +7,11 @@ import extractDate from "lume/plugins/extract_date.ts";
 import readingInfo from "lume/plugins/reading_info.ts";
 import date from "lume/plugins/date.ts";
 import shikiji from "https://deno.land/x/lume_shikiji/mod.ts";
+import feed from "lume/plugins/feed.ts";
 import { enCA } from "npm:date-fns@4.1.0/locale/en-CA";
 import { frCA } from "npm:date-fns@4.1.0/locale/fr-CA";
+
+import excerpt from "./src/_plugins/excerpt.ts";
 
 const site = lume({
   src: "./src",
@@ -58,6 +61,23 @@ site.use(
 site.use(
   date({
     locales: { enCA, frCA },
+  }),
+);
+
+site.use(excerpt({ length: 30 }));
+
+site.use(
+  feed({
+    output: ["/blog.rss", "/blog.json"],
+    query: "post",
+    info: {
+      title: "=site.title",
+      description: "=site.description",
+    },
+    items: {
+      title: "=title",
+      description: "=excerpt",
+    },
   }),
 );
 

@@ -6,7 +6,12 @@
         href="{{ page.url }}"
         class="block p-4 bg-neutral-100 dark:bg-neutral-800 rounded-lg no-underline flex flex-col hover:bg-neutral-200 dark:hover:bg-neutral-700 transition"
       >
-        <p class="text-xl m-0!">{{ page.title }}</p>
+        <p class="text-xl font-bold m-0!">{{ page.title }}</p>
+        {{ if page.excerpt.length }}
+          <p class="text-neutral-700 dark:text-neutral-300 mt-1">
+            {{ page.excerpt }}
+          </p>
+        {{ /if }}
         <div class="text-sm text-neutral-500 mt-1">
           <time>{{ page.date |> date }}</time>
           •
