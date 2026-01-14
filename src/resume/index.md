@@ -1,8 +1,7 @@
 ---
+title: Resume
 layout: layouts/article.vto
 ---
-
-# Resume
 
 ## Download
 

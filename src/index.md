@@ -1,4 +1,5 @@
 ---
+title: Home
 layout: layouts/main.vto
 ---
 
