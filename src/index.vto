@@ -3,14 +3,22 @@ title: Home
 layout: layouts/main.vto
 ---
 
+{{
+  set id = "6a9a7fff1233f41178b5aa8cd23bffc11ea8f5297f91da26832fc80aab035fce"
+}}
+
 <div
   class="max-w-3xl mx-auto min-h-full flex flex-col gap-8 justify-center md:items-start md:text-left items-center text-center"
 >
-  <img
-    src="https://gravatar.com/avatar/6a9a7fff1233f41178b5aa8cd23bffc11ea8f5297f91da26832fc80aab035fce?s=92"
-    alt="Portrait of Dan Greco"
-    class="rounded-full w-24 h-24"
-  />
+  <div class="w-24 h-24 rounded-full overflow-hidden">
+    {{
+      await comp.lazy({
+        hq: `https://gravatar.com/avatar/${id}?s=256`,
+        lq: `https://gravatar.com/avatar/${id}?s=80`,
+        alt: "Portrait of Dan Greco",
+      })
+    }}
+  </div>
   <h1 class="text-4xl font-black">Hi, I'm Dan! 👋</h1>
   <p class="text-2xl text-neutral-500">
     I'm a software engineer interested in home automation, embedded systems, and
