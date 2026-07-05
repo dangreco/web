@@ -1,10 +1,25 @@
-<footer class="text-center text-sm text-neutral-500 mt-4">
-  <p>
-    © <span id="year"></span> Dan Greco • <a
-      class="underline"
-      href="https://github.com/dangreco/web/blob/main/LICENSE"
-    >GPL-3.0</a>
-  </p>
+<footer class="rule-top mt-24">
+  <div
+    class="mx-auto max-w-[1200px] px-6 lg:px-10 py-10 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6 items-end"
+  >
+    <div class="flex flex-wrap items-center gap-x-6 gap-y-2 text-[13px]">
+      <a
+        href="https://github.com/dangreco"
+        class="text-ink-soft hover:text-accent transition-colors"
+      >GitHub</a>
+      <a
+        href="https://linkedin.com/in/danrgreco"
+        class="text-ink-soft hover:text-accent transition-colors"
+      >LinkedIn</a>
+    </div>
+    <div class="flex flex-wrap items-center gap-x-6 gap-y-2 text-[13px]">
+      <a
+        href="https://github.com/dangreco/web/blob/main/LICENSE"
+        class="index-num"
+      >GPL-3.0</a>
+      <span class="index-num">© <span id="year"></span></span>
+    </div>
+  </div>
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
   </script>

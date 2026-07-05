@@ -3,26 +3,267 @@ title: Home
 layout: layouts/main.vto
 ---
 
-{{
-  set id = "6a9a7fff1233f41178b5aa8cd23bffc11ea8f5297f91da26832fc80aab035fce"
-}}
-
-<div
-  class="max-w-3xl mx-auto min-h-full flex flex-col gap-8 justify-center md:items-start md:text-left items-center text-center"
->
-  <div class="w-24 h-24 rounded-full overflow-hidden">
-    {{
-      await comp.lazy({
-        hq: `https://gravatar.com/avatar/${id}?s=256`,
-        lq: `https://gravatar.com/avatar/${id}?s=80`,
-        alt: "Portrait of Dan Greco",
-      })
-    }}
+{{# Hero #}}
+<section class="relative rule-bottom overflow-hidden">
+  {{# Full-bleed logic-analyzer waveforms #}}
+  {{ await comp.waves() }}
+  {{# Scrim: keeps the text legible over the traces (paper → transparent) #}}
+  <div
+    aria-hidden
+    class="absolute inset-0 z-10 pointer-events-none bg-[linear-gradient(to_right,var(--color-paper)_0%,color-mix(in_oklch,var(--color-paper)_82%,transparent)_46%,transparent_78%)]"
+  >
   </div>
-  <h1 class="text-4xl font-black">Hi, I'm Dan! 👋</h1>
-  <p class="text-2xl text-neutral-500">
-    I'm a software engineer interested in home automation, embedded systems, and
-    hardware design.
-  </p>
-  <div class="block bg-transparent w-24 h-24"></div>
-</div>
+
+  <div
+    class="relative z-20 mx-auto max-w-[1200px] px-6 lg:px-10 pt-16 pb-20 lg:pt-24 lg:pb-28 pointer-events-none"
+  >
+    <div class="max-w-[80ch]">
+      <div class="flex items-center gap-3 mb-8 max-w-[520px]">
+        <div class="eyebrow mb-3">01 / Index</div>
+      </div>
+      <h1
+        class="font-display font-semibold tracking-[-0.025em] text-[clamp(2.75rem,7vw,5.75rem)] leading-[0.95] text-ink text-balance"
+      >
+        Backend systems, developer tooling, and the hardware in-between.
+      </h1>
+      <p
+        class="mt-8 max-w-[52ch] text-[17px] leading-[1.6] text-ink-soft text-pretty"
+      >
+        Software engineer in Toronto working on backend systems, infrastructure,
+        and developer tooling. On the side, home automation, 3D printing, and
+        the occasional PCB.
+      </p>
+      <div class="mt-10 flex flex-wrap gap-3 pointer-events-auto">
+        <a
+          href="/blog"
+          class="inline-flex items-center gap-2 h-11 px-5 bg-ink text-paper text-[13px] font-medium hover:bg-accent transition-colors"
+        >
+          Read the blog
+          <span aria-hidden>→</span>
+        </a>
+        <a
+          href="/resume"
+          class="inline-flex items-center gap-2 h-11 px-5 border border-rule-strong text-ink text-[13px] font-medium hover:border-accent hover:text-accent transition-colors"
+        >
+          Resume
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{{# Repositories #}}
+<section id="work" class="mx-auto max-w-[1200px] px-6 lg:px-10 py-20 lg:py-28">
+  <div class="flex items-end justify-between gap-6 rule-bottom pb-4">
+    <div>
+      <div class="eyebrow mb-3">02 / Open Source</div>
+      <h2
+        class="font-display text-[28px] md:text-[36px] font-semibold tracking-[-0.02em] text-ink"
+      >
+        Repositories
+      </h2>
+    </div>
+    <div class="pb-1">
+      <a
+        href="https://github.com/dangreco"
+        class="link-accent text-[13px] font-medium"
+      >
+        View all on GitHub →
+      </a>
+    </div>
+  </div>
+
+  <div
+    class="mt-8 hidden md:grid grid-cols-[36px_1fr_140px_100px_120px_28px] gap-4 pb-3 rule-bottom"
+  >
+    <span class="index-num">No.</span>
+    <span class="eyebrow">Repository</span>
+    <span class="eyebrow">Language</span>
+    <span class="eyebrow text-right">Stars</span>
+    <span class="eyebrow text-right">Updated</span>
+    <span></span>
+  </div>
+
+  <ul>
+    {{ set n = 0 }}
+    {{ for repo of repos }}
+      {{ set n = n + 1 }}
+      <li>
+        <a
+          href="{{ repo.href }}"
+          class="group grid grid-cols-[36px_1fr] md:grid-cols-[36px_1fr_140px_100px_120px_28px] gap-x-4 gap-y-2 py-6 rule-bottom hover:bg-panel/40 transition-colors -mx-3 px-3"
+        >
+          <span class="index-num pt-1">{{ n < 10 ? `0${n}` : n }}</span>
+
+          <div class="min-w-0">
+            <div class="flex items-baseline gap-3">
+              <span
+                class="font-display text-[20px] md:text-[22px] font-semibold text-ink group-hover:text-accent transition-colors truncate"
+              >{{ repo.name }}</span>
+              <span aria-hidden class="hidden md:inline text-ink-mute">↗</span>
+            </div>
+            {{ if repo.description }}
+              <p
+                class="mt-1 text-[14px] leading-[1.55] text-ink-soft max-w-[62ch]"
+              >
+                {{ repo.description }}
+              </p>
+            {{ /if }}
+            <div
+              class="mt-3 flex items-center gap-4 md:hidden text-[12px] text-ink-mute"
+            >
+              <span class="inline-flex items-center gap-2 text-ink-soft">
+                <svg aria-hidden viewBox="0 0 10 10" class="size-2.5 shrink-0">
+                  <circle
+                    cx="5"
+                    cy="5"
+                    r="4.5"
+                    fill="{{ repo.languageColor }}"
+                    stroke="rgba(0,0,0,0.1)"
+                  />
+                </svg>
+                {{ repo.language }}
+              </span>
+              <span class="font-mono tabular-nums">★ {{
+                  repo.starsLabel
+                }}</span>
+              {{ if repo.updated }}<span>{{ repo.updated }}</span>{{ /if }}
+            </div>
+          </div>
+
+          <div class="hidden md:flex items-start pt-1">
+            <span
+              class="inline-flex items-center gap-2 text-[13px] text-ink-soft"
+            >
+              <svg aria-hidden viewBox="0 0 10 10" class="size-2.5 shrink-0">
+                <circle
+                  cx="5"
+                  cy="5"
+                  r="4.5"
+                  fill="{{ repo.languageColor }}"
+                  stroke="rgba(0,0,0,0.1)"
+                />
+              </svg>
+              {{ repo.language }}
+            </span>
+          </div>
+          <div
+            class="hidden md:block pt-1 text-right font-mono text-[13px] tabular-nums text-ink-soft"
+          >
+            ★ {{ repo.starsLabel }}
+          </div>
+          <div
+            class="hidden md:block pt-1 text-right text-[13px] text-ink-mute"
+          >
+            {{ repo.updated }}
+          </div>
+          <div
+            class="hidden md:flex items-start justify-end pt-1 text-ink-mute group-hover:text-accent transition-colors"
+          >
+            →
+          </div>
+        </a>
+      </li>
+    {{ /for }}
+  </ul>
+</section>
+
+{{# Recent writing #}}
+<section class="bg-panel/60 rule-top rule-bottom">
+  <div class="mx-auto max-w-[1200px] px-6 lg:px-10 py-20 lg:py-24">
+    <div class="flex items-end justify-between gap-6 rule-bottom pb-4">
+      <div>
+        <div class="eyebrow mb-3">03 / Notebook</div>
+        <h2
+          class="font-display text-[28px] md:text-[36px] font-semibold tracking-[-0.02em] text-ink"
+        >
+          Recent writing
+        </h2>
+      </div>
+      <div class="pb-1">
+        <a href="/blog" class="link-accent text-[13px] font-medium"
+        >All posts →</a>
+      </div>
+    </div>
+    <ul class="mt-10 grid gap-px bg-rule border border-rule">
+      {{ set p = 0 }}
+      {{ for post of search.pages("post", "date=desc").slice(0, 3) }}
+        {{ set p = p + 1 }}
+        <li class="bg-paper">
+          <a
+            href="{{ post.url }}"
+            class="group grid grid-cols-1 md:grid-cols-[64px_1fr_140px] gap-4 md:gap-8 p-6 md:p-8 hover:bg-panel/40 transition-colors"
+          >
+            <span class="index-num pt-1">{{ p < 10 ? `0${p}` : p }}</span>
+            <div>
+              <div
+                class="flex flex-wrap items-center gap-3 text-[12px] text-ink-mute"
+              >
+                <span class="font-mono tabular-nums">{{
+                  post.date
+                  |> date
+                }}</span>
+                <span aria-hidden>·</span>
+                <span>{{ post.readingInfo.minutes }} min read</span>
+              </div>
+              <h3
+                class="mt-3 font-display text-[22px] md:text-[26px] font-semibold leading-[1.15] text-ink group-hover:text-accent transition-colors text-balance"
+              >
+                {{ post.title }}
+              </h3>
+              {{ if post.excerpt && post.excerpt.length }}
+                <p
+                  class="mt-3 text-[14px] leading-[1.6] text-ink-soft max-w-[70ch]"
+                >
+                  {{ post.excerpt }}
+                </p>
+              {{ /if }}
+            </div>
+            <div
+              class="hidden md:flex items-start justify-end pt-2 text-ink-mute group-hover:text-accent transition-colors"
+            >
+              Read →
+            </div>
+          </a>
+        </li>
+      {{ /for }}
+    </ul>
+  </div>
+</section>
+
+{{# Resume callout #}}
+<section class="mx-auto max-w-[1200px] px-6 lg:px-10 py-20 lg:py-24">
+  <div class="flex items-end justify-between gap-6 rule-bottom pb-4">
+    <div>
+      <div class="eyebrow mb-3">04 / Credentials</div>
+      <h2
+        class="font-display text-[28px] md:text-[36px] font-semibold tracking-[-0.02em] text-ink"
+      >
+        Resume
+      </h2>
+    </div>
+  </div>
+  <div
+    class="mt-8 grid grid-cols-1 md:grid-cols-[1.2fr_1fr] gap-10 md:gap-16 items-end"
+  >
+    <p class="text-[17px] leading-[1.6] text-ink-soft max-w-[52ch]">
+      The full resume is a PDF. It's GPG-signed and published with a SHA-256
+      checksum, so you can verify it before you read it.
+    </p>
+    <div class="flex flex-wrap gap-3 md:justify-end">
+      <a
+        href="/resume"
+        class="inline-flex items-center gap-2 h-11 px-5 bg-ink text-paper text-[13px] font-medium hover:bg-accent transition-colors"
+      >
+        Open resume
+        <span aria-hidden>→</span>
+      </a>
+      <a
+        href="https://dangreco-resume.s3.ca-central-1.amazonaws.com/production/resume.en.pdf"
+        class="inline-flex items-center gap-2 h-11 px-5 border border-rule-strong text-ink text-[13px] font-medium hover:border-accent hover:text-accent transition-colors"
+      >
+        Download PDF
+      </a>
+    </div>
+  </div>
+</section>
