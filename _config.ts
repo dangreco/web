@@ -28,7 +28,17 @@ site.use(readingInfo());
 site.use(
   shikiji({
     highlighter: {
-      langs: ["javascript", "bash", "python"],
+      langs: [
+        "javascript",
+        "bash",
+        "python",
+        "rust",
+        "ocaml",
+        "haskell",
+        "c",
+        "c++",
+        "yaml",
+      ],
       themes: ["min-light", "min-dark"],
     },
     themes: {
@@ -38,21 +48,15 @@ site.use(
     defaultColor: "light",
     extraCSS: `
       .shiki {
+        /* Use your dynamic OKLCH variables for the container */
+        background-color: var(--color-panel) !important;
+        border: 1px solid var(--color-rule);
+        border-radius: 0.375rem; /* Optional: rounds the corners */
+        padding: 1rem;           /* Optional: gives the code breathing room */
+
         transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
         transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
         transition-duration: 150ms;
-      }
-      [data-color="dark"] .shiki {
-        background-color: #27272a !important;
-        border-width: 2px;
-        border-style: solid;
-        border-color: #27272a;
-      }
-      [data-color="light"] .shiki {
-        background-color: #f5f5f5 !important;
-        border-width: 2px;
-        border-style: solid;
-        border-color: rgb(229 229 229 / var(--tw-border-opacity, 1));
       }
     `,
   }),

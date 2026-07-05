@@ -1,28 +1,75 @@
 ---
-title: Blog
+title: Writing
+layout: layouts/main.vto
 ---
 
-<ul class="list-none p-0 flex flex-col gap-4">
-  {{ for page of search.pages("post", "date=desc") }}
-    <li class="m-0! p-0!">
-      <a
-        href="{{ page.url }}"
-        class="block p-4 bg-neutral-100 dark:bg-neutral-800 rounded-lg no-underline flex flex-col hover:bg-neutral-200 dark:hover:bg-neutral-700 transition"
-      >
-        <p class="text-xl font-bold m-0!">{{ page.title }}</p>
-        {{ if page.excerpt.length }}
-          <p class="text-neutral-700 dark:text-neutral-300 mt-1">
-            {{ page.excerpt }}
-          </p>
-        {{ /if }}
-        <div class="text-sm text-neutral-500 mt-1">
-          <time>{{ page.date |> date }}</time>
-          •
-          <span>
-            {{ page.readingInfo.minutes }} min
-          </span>
-        </div>
-      </a>
-    </li>
-  {{ /for }}
-</ul>
+{{ set posts = search.pages("post", "date=desc") }}
+
+<section class="rule-bottom">
+  <div
+    class="mx-auto max-w-[1200px] px-6 lg:px-10 pt-16 pb-14 lg:pt-24 lg:pb-20"
+  >
+    <div class="flex items-center gap-3 mb-8">
+      <div class="eyebrow mb-3">02 / Notes</div>
+    </div>
+    <h1
+      class="font-display font-semibold tracking-[-0.025em] text-[clamp(2.5rem,6vw,4.75rem)] leading-[0.95] text-ink text-balance max-w-[18ch]"
+    >
+      Field notes.
+    </h1>
+    <p class="mt-6 max-w-[56ch] text-[16px] leading-[1.6] text-ink-soft">
+      Build logs and technical notes, mostly backend systems, infrastructure,
+      and home-automation projects.
+    </p>
+  </div>
+</section>
+
+<section class="mx-auto max-w-[1200px] px-6 lg:px-10 py-16">
+  {{ if posts.length }}
+    <ul class="border-b border-rule">
+      {{ set n = 0 }}
+      {{ for post of posts }}
+        {{ set n = n + 1 }}
+        <li>
+          <a
+            href="{{ post.url }}"
+            class="group grid grid-cols-1 md:grid-cols-[80px_1fr_180px] gap-4 md:gap-10 py-8 md:py-10 rule-top first:border-t-0 hover:bg-panel/40 transition-colors -mx-3 px-3"
+          >
+            <span class="index-num pt-2">{{ n < 10 ? `0${n}` : n }}</span>
+            <div>
+              <div
+                class="flex flex-wrap items-center gap-3 text-[12px] text-ink-mute"
+              >
+                <span class="font-mono tabular-nums">{{
+                  post.date
+                  |> date
+                }}</span>
+                <span aria-hidden>·</span>
+                <span>{{ post.readingInfo.minutes }} min read</span>
+              </div>
+              <h2
+                class="mt-3 font-display text-[26px] md:text-[32px] font-semibold leading-[1.1] tracking-[-0.015em] text-ink group-hover:text-accent transition-colors text-balance"
+              >
+                {{ post.title }}
+              </h2>
+              {{ if post.excerpt && post.excerpt.length }}
+                <p
+                  class="mt-4 text-[15px] leading-[1.65] text-ink-soft max-w-[70ch]"
+                >
+                  {{ post.excerpt }}
+                </p>
+              {{ /if }}
+            </div>
+            <div
+              class="hidden md:flex items-start justify-end pt-3 text-ink-mute group-hover:text-accent transition-colors text-[13px] font-medium"
+            >
+              Read post →
+            </div>
+          </a>
+        </li>
+      {{ /for }}
+    </ul>
+  {{ else }}
+    <p class="text-ink-mute">No posts yet. Check back soon.</p>
+  {{ /if }}
+</section>

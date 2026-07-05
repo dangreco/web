@@ -1,14 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
   {{ await comp.meta.head({ title }) }}
-  <body
-    class="max-w-7xl mx-auto p-4 flex flex-col min-h-screen gap-4 bg-white dark:bg-neutral-900 text-black dark:text-white"
-  >
+  <body class="min-h-screen bg-paper text-ink font-sans flex flex-col">
     {{ await comp.layout.header() }}
-    <main class="overflow-x-hidden flex-grow">
-      <article class="prose mx-auto dark:prose-invert">
-        <h1>{{ title }}</h1>
-        {{ content }}
+    <main class="flex-1">
+      <article class="mx-auto max-w-[720px] px-6 lg:px-10 py-16 lg:py-24">
+        <header class="rule-bottom pb-8 mb-10">
+          {{ if date }}
+            <div class="flex items-center gap-3 text-[12px] text-ink-mute mb-5">
+              <span class="font-mono tabular-nums">{{ date |> date }}</span>
+              {{ if readingInfo }}
+                <span aria-hidden>·</span>
+                <span>{{ readingInfo.minutes }} min read</span>
+              {{ /if }}
+            </div>
+          {{ /if }}
+          <h1
+            class="font-display text-[clamp(2rem,5vw,3.25rem)] font-semibold tracking-[-0.02em] leading-[1.05] text-ink text-balance"
+          >
+            {{ title }}
+          </h1>
+        </header>
+        <div
+          class="prose max-w-none prose-headings:font-display prose-headings:font-semibold prose-headings:tracking-[-0.015em] prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-code:font-mono prose-img:rounded-md"
+        >
+          {{ content }}
+        </div>
       </article>
     </main>
     {{ await comp.layout.footer() }}

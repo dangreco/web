@@ -1,9 +1,35 @@
-<header class="flex justify-between items-center mb-4">
-  <div>
-    <a href="/" class="font-bold text-lg">dangre.co</a>
+<header class="sticky top-0 z-40 bg-paper/85 backdrop-blur-sm rule-bottom">
+  <div
+    class="mx-auto max-w-[1200px] px-6 lg:px-10 h-14 flex items-center justify-between"
+  >
+    <a
+      href="/"
+      class="flex items-baseline gap-2 group"
+      aria-label="Dan Greco, home"
+    >
+      <span
+        class="font-display text-[15px] font-semibold tracking-tight text-ink"
+      >
+        Dan&nbsp;Greco
+      </span>
+      <span class="index-num hidden sm:inline">dangre.co</span>
+    </a>
+    <nav class="flex items-center gap-1">
+      {{
+        set links = [["/", "Index"], ["/blog", "Notes"], ["/resume", "Resume"]]
+      }}
+      {{ for link of links }}
+        <a
+          href="{{ link[0] }}"
+          class="group relative px-3 py-2 text-[13px] font-medium text-ink-soft hover:text-ink transition-colors"
+        >
+          <span>{{ link[1] }}</span>
+          <span
+            aria-hidden
+            class="absolute left-3 right-3 -bottom-px h-px bg-accent origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-200"
+          ></span>
+        </a>
+      {{ /for }}
+    </nav>
   </div>
-  <nav class="flex gap-4">
-    <a href="/blog">Blog</a>
-    <a href="/resume">Resume</a>
-  </nav>
 </header>
