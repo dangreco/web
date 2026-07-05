@@ -19,6 +19,14 @@
     async
   ></script>
   <title>dangre.co | {{ title }}</title>
+  {{ if image }}
+    <meta property="og:image" content="{{ image |> url(true) }}" />
+    <meta property="og:title" content="{{ title }}" />
+    <meta property="og:type" content="article" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="{{ image |> url(true) }}" />
+    <meta name="twitter:title" content="{{ title }}" />
+  {{ /if }}
   <script>
     function setTheme() {
     const userPrefersDark = window.matchMedia &&

@@ -9,8 +9,30 @@ layout: layouts/main.vto
   <div
     class="mx-auto max-w-[1200px] px-6 lg:px-10 pt-16 pb-14 lg:pt-24 lg:pb-20"
   >
-    <div class="flex items-center gap-3 mb-8">
+    <div class="flex items-center justify-between gap-3 mb-8">
       <div class="eyebrow mb-3">02 / Notes</div>
+      <a
+        href="/blog.rss"
+        type="application/rss+xml"
+        aria-label="RSS feed"
+        class="group inline-flex items-center gap-1.5 rounded-full border border-rule px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.12em] text-ink-mute hover:text-ink hover:border-rule-strong transition-colors"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="h-3.5 w-3.5"
+          aria-hidden="true"
+        >
+          <path d="M4 11a9 9 0 0 1 9 9"></path>
+          <path d="M4 4a16 16 0 0 1 16 16"></path>
+          <circle cx="5" cy="19" r="1"></circle>
+        </svg>
+        RSS
+      </a>
     </div>
     <h1
       class="font-display font-semibold tracking-[-0.025em] text-[clamp(2.5rem,6vw,4.75rem)] leading-[0.95] text-ink text-balance max-w-[18ch]"
