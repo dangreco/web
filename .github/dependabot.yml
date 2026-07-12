@@ -7,3 +7,10 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    # PRs are squash-merged, so the PR title becomes the commit subject that
+    # release-please parses. Without this, Dependabot's default "Bump x from a
+    # to b" title fails the conventional-title check in pr.yml.
+    # Yields: "build(deps): bump x from a to b" -> Dependencies changelog section.
+    commit-message:
+      prefix: "build"
+      include: "scope"
