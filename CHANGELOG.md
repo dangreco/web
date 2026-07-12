@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.2.1](https://github.com/dangreco/web/compare/v0.2.0...v0.2.1) (2026-07-12)
+
+
+### Dependencies
+
+* **deps:** bump actions/attest-build-provenance from 3.1.0 to 4.1.1 ([#25](https://github.com/dangreco/web/issues/25)) ([93d9311](https://github.com/dangreco/web/commit/93d9311ab23fee4136e47bfdb08dbf597687f893))
+* **deps:** bump docker/build-push-action from 6.18.0 to 7.3.0 ([#24](https://github.com/dangreco/web/issues/24)) ([d3507c6](https://github.com/dangreco/web/commit/d3507c6ce8490a0997deb4ebd96ba7c4aacec10e))
+* **deps:** bump docker/login-action from 3.6.0 to 4.4.0 ([#23](https://github.com/dangreco/web/issues/23)) ([da2c67c](https://github.com/dangreco/web/commit/da2c67caea8c348a83c5435d76815e552460fb30))
+
 ## [0.2.0](https://github.com/dangreco/web/compare/v0.1.0...v0.2.0) (2026-07-12)
 
 
