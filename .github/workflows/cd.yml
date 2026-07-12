@@ -3,12 +3,15 @@
 # yamllint disable rule:line-length
 # yamllint disable rule:comments
 name: CD
+# Only a release tag publishes an image. main is fast-forwarded to the release
+# commit by release.yml, but it is the tag push that builds. workflow_dispatch
+# is the manual escape hatch for rebuilding against refreshed base images
+# (the Dockerfile tracks floating nixos/nix:latest and nginx:alpine).
 on:
   push:
-    branches:
-      - main
-  schedule:
-    - cron: "0 0 * * *"
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
@@ -36,6 +39,13 @@ jobs:
         uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5.10.0
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          # A non-prerelease semver tag is also promoted to :latest by the
+          # default flavor, which is what the deployment tracks.
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=sha
 
       - name: Build and push Docker image
         id: push

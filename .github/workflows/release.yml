@@ -1,0 +1,56 @@
+---
+# yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
+# yamllint disable rule:line-length
+# yamllint disable rule:comments
+name: Release
+# Keeps a single long-lived release PR open against dev. Merging it bumps the
+# version in deno.json, writes CHANGELOG.md, tags vX.Y.Z and cuts a GitHub
+# Release; the tag push is what triggers CD. main is then fast-forwarded to the
+# release commit, so main always points at the latest release.
+on:
+  push:
+    branches:
+      - dev
+  workflow_dispatch:
+concurrency:
+  group: release
+  cancel-in-progress: false
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      # App token is required so the tag release-please pushes triggers cd.yml.
+      # A tag pushed with the default GITHUB_TOKEN does not trigger workflows.
+      - name: Generate app token
+        id: app-token
+        uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349 # v2.2.2
+        with:
+          app-id: ${{ secrets.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+
+      - name: Run release-please
+        id: release
+        uses: googleapis/release-please-action@5c625bfb5d1ff62eadeeb3772007f7f66fdcf071 # v4.4.1
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+          target-branch: dev
+
+      - name: Checkout repository
+        if: steps.release.outputs.release_created
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          ref: dev
+          fetch-depth: 0
+          token: ${{ steps.app-token.outputs.token }}
+
+      - name: Fast-forward main to the release commit
+        if: steps.release.outputs.release_created
+        # HEAD is dev's tip (the release commit). main is an ancestor of dev by
+        # construction, so a non-fast-forward here signals real divergence and
+        # should fail rather than be forced.
+        run: git push origin "HEAD:refs/heads/main"
