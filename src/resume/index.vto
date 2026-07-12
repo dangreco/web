@@ -3,10 +3,6 @@ title: Résumé
 layout: layouts/main.vto
 ---
 
-{{
-  set base = "https://dangreco-resume.s3.ca-central-1.amazonaws.com/production"
-}}
-
 <section class="rule-bottom">
   <div
     class="mx-auto max-w-[1200px] px-6 lg:px-10 pt-16 pb-14 lg:pt-24 lg:pb-20"
@@ -34,7 +30,7 @@ layout: layouts/main.vto
     <div>
       <div class="eyebrow mb-4">Download</div>
       <a
-        href="{{ base }}/resume.en.pdf"
+        href="{{ resume.pdf.href }}"
         class="block border border-accent bg-accent text-accent-ink p-5 hover:brightness-90 transition group"
       >
         <div class="flex items-center justify-between">
@@ -43,12 +39,29 @@ layout: layouts/main.vto
               PDF
             </div>
             <div class="font-display text-[20px] font-semibold mt-1">
-              resume.en.pdf
+              {{ resume.pdf.name }}
             </div>
+            {{ if resume.available }}
+              <div class="text-[13px] mt-1 opacity-70">
+                {{ resume.pdf.sizeLabel }} · {{ resume.pagesLabel }}
+              </div>
+            {{ /if }}
           </div>
           <span aria-hidden class="text-2xl">↓</span>
         </div>
       </a>
+
+      {{ if resume.available }}
+        <div
+          class="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-ink-mute"
+        >
+          <span class="index-num">v{{ resume.version }}</span>
+          <span aria-hidden>·</span>
+          <span>{{ resume.releasedAt |> date("HUMAN_DATE") }}</span>
+          <span aria-hidden>·</span>
+          <span class="font-mono">{{ resume.commitShort }}</span>
+        </div>
+      {{ /if }}
     </div>
 
     <div class="text-[13px] text-ink-mute leading-[1.6]">
@@ -66,15 +79,27 @@ layout: layouts/main.vto
         <div class="p-4">
           <dt class="index-num mb-2">GPG signature</dt>
           <dd class="font-mono leading-[1.6] text-ink-soft">
-            <a href="{{ base }}/resume.en.pdf.asc" class="link-accent"
-            >resume.en.pdf.asc</a>
+            <a href="{{ resume.signature.href }}" class="link-accent">{{
+              resume.signature.name
+            }}</a>
           </dd>
         </div>
         <div class="p-4">
           <dt class="index-num mb-2">SHA-256 checksum</dt>
           <dd class="font-mono leading-[1.6] text-ink-soft">
-            <a href="{{ base }}/checksums.txt" class="link-accent"
-            >checksums.txt</a>
+            {{ if resume.available }}
+              <div class="break-all text-ink" title="{{ resume.pdf.name }}">
+                {{ resume.pdf.sha256 }}
+              </div>
+              <a
+                href="{{ resume.checksums.href }}"
+                class="link-accent inline-block mt-2"
+              >{{ resume.checksums.name }}</a>
+            {{ else }}
+              <a href="{{ resume.checksums.href }}" class="link-accent">{{
+                resume.checksums.name
+              }}</a>
+            {{ /if }}
           </dd>
         </div>
       </dl>
