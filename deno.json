@@ -19,6 +19,7 @@
       "net": [
         "0.0.0.0",
         "api.github.com:443",
+        "dangreco-resume.s3.ca-central-1.amazonaws.com:443",
         "cdn.jsdelivr.net:443",
         "data.jsdelivr.com:443",
         "jsr.io:443",
