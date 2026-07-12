@@ -57,6 +57,11 @@
     "temporal",
     "fmt-component"
   ],
+  "fmt": {
+    "exclude": [
+      "CHANGELOG.md"
+    ]
+  },
   "lint": {
     "plugins": [
       "https://cdn.jsdelivr.net/gh/lumeland/lume@3.1.4/lint.ts"
