@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/dangreco/web/compare/v0.4.0...v0.5.0) (2026-07-30)
+
+
+### Features
+
+* add Umami tracking script to production head ([#38](https://github.com/dangreco/web/issues/38)) ([bc939b1](https://github.com/dangreco/web/commit/bc939b132e90080a4832e12ebf9b9c0d6f255331))
+
 ## [0.4.0](https://github.com/dangreco/web/compare/v0.3.0...v0.4.0) (2026-07-30)
 
 
