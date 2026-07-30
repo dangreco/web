@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/dangreco/web/compare/v0.3.0...v0.4.0) (2026-07-30)
+
+
+### Features
+
+* add interactive playgrounds, flow charts, blog post ([#36](https://github.com/dangreco/web/issues/36)) ([9c186b9](https://github.com/dangreco/web/commit/9c186b964907d5d861f1aac1b07bdce6a9e3a79f))
+
 ## [0.3.0](https://github.com/dangreco/web/compare/v0.2.1...v0.3.0) (2026-07-12)
 
 
