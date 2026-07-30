@@ -28,6 +28,15 @@
   --accent: oklch(0.585 0.198 32); /* vermilion */
   --accent-ink: oklch(0.98 0.01 85); /* text on accent */
   --panel: oklch(0.93 0.014 85); /* subtle tinted panel */
+  /* Editor syntax tokens — the bespoke "Ember" palette, shared with the
+     shikiji themes in src/_themes/ember.ts so the live playground and the
+     statically highlighted code blocks are identical. All-warm arc: vermilion
+     keywords (the accent verbatim), amber types, olive strings. */
+  --syn-comment: #a0968f;
+  --syn-keyword: #d83b21;
+  --syn-string: #626a09;
+  --syn-const: #b45000;
+  --syn-type: #9f6200;
 }
 
 /* Dark palette: mirror under prefers-color-scheme (no-JS fallback) and the
@@ -44,6 +53,12 @@
     --accent: oklch(0.7 0.185 38);
     --accent-ink: oklch(0.16 0.01 60);
     --panel: oklch(0.22 0.01 60);
+    /* "Ember" dark counterparts */
+    --syn-comment: #6d685f;
+    --syn-keyword: #fb6c3e;
+    --syn-string: #b7c874;
+    --syn-const: #ffa460;
+    --syn-type: #efba64;
   }
 }
 
@@ -57,6 +72,11 @@ body[data-color="dark"] {
   --accent: oklch(0.7 0.185 38);
   --accent-ink: oklch(0.16 0.01 60);
   --panel: oklch(0.22 0.01 60);
+  --syn-comment: #6d685f;
+  --syn-keyword: #fb6c3e;
+  --syn-string: #b7c874;
+  --syn-const: #ffa460;
+  --syn-type: #efba64;
 }
 
 body[data-color="light"] {
@@ -69,6 +89,11 @@ body[data-color="light"] {
   --accent: oklch(0.585 0.198 32);
   --accent-ink: oklch(0.98 0.01 85);
   --panel: oklch(0.93 0.014 85);
+  --syn-comment: #a0968f;
+  --syn-keyword: #d83b21;
+  --syn-string: #626a09;
+  --syn-const: #b45000;
+  --syn-type: #9f6200;
 }
 
 @layer base {
@@ -175,4 +200,492 @@ code[data-line-numbers="false"] .line::before {
   counter-increment: none;
   width: 0;
   margin-right: 0;
+}
+
+/* Interactive playground chrome. Matches the .shiki container language
+   (panel bg, --color-rule hairline, 0.375rem radius) and flips with the theme
+   via the palette variables. */
+.pg {
+  border: 1px solid var(--color-rule);
+  border-radius: 0.375rem;
+  overflow: hidden;
+  background: var(--color-panel);
+  transition: background-color 150ms, border-color 150ms;
+}
+.pg-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.5rem;
+  border-bottom: 1px solid var(--color-rule);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+.pg-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-right: auto;
+  min-width: 0;
+}
+.pg-tabs button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.25rem;
+  color: var(--color-ink-mute);
+  transition: color 120ms, background-color 120ms;
+}
+.pg-tabs button:hover {
+  color: var(--color-ink);
+}
+.pg-tabs button[aria-selected="true"] {
+  color: var(--color-ink);
+  background: var(--color-rule);
+}
+
+/* Run control: icon-only, transparent, muted until hovered. */
+.pg-run {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.15rem;
+  background: none;
+  border: none;
+  border-radius: 0.25rem;
+  color: var(--color-ink-mute);
+  cursor: pointer;
+  flex: none;
+  transition: color 120ms ease, opacity 120ms ease;
+}
+.pg-run:hover:not(:disabled) {
+  color: var(--color-ink);
+}
+.pg-run:disabled {
+  opacity: 0.4;
+  cursor: progress;
+}
+.pg-run svg {
+  display: block;
+}
+
+/* State chip, pinned to the right of the bar. The section carries the state as
+   a data attribute and hands the dot its colour through --pg-dot, so adding a
+   state is a declarative two-line change. The label stays muted — the dot is
+   what carries the signal. */
+.pg-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex: none;
+  color: var(--color-ink-mute);
+  user-select: none;
+}
+.pg-dot {
+  position: relative;
+  width: 0.4375rem;
+  height: 0.4375rem;
+  border-radius: 50%;
+  flex: none;
+  color: var(--pg-dot, var(--color-ink-mute));
+  background: currentColor;
+  transition: color 200ms ease;
+}
+.pg[data-pg-state="loading"],
+.pg[data-pg-state="bundling"] {
+  --pg-dot: var(--syn-type);
+}
+.pg[data-pg-state="running"] {
+  --pg-dot: var(--syn-string);
+}
+.pg[data-pg-state="error"] {
+  --pg-dot: var(--color-accent);
+}
+.pg[data-pg-state="error"] .pg-state {
+  color: var(--color-accent);
+}
+
+/* Working: a breathing dot. */
+@keyframes pg-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.72);
+  }
+}
+.pg[data-pg-state="loading"] .pg-dot,
+.pg[data-pg-state="bundling"] .pg-dot {
+  animation: pg-pulse 1s ease-in-out infinite;
+}
+
+/* Live: a ring pinging outward from the dot. */
+@keyframes pg-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  70%, 100% {
+    transform: scale(2.8);
+    opacity: 0;
+  }
+}
+.pg[data-pg-state="running"] .pg-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: currentColor;
+  animation: pg-ping 1.6s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* Failed: two quick flashes, then hold. */
+@keyframes pg-flash {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+}
+.pg[data-pg-state="error"] .pg-dot {
+  animation: pg-flash 0.4s ease-in-out 2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pg-dot,
+  .pg-dot::after {
+    animation: none;
+  }
+  /* Keep a static halo so "running" still reads as live. */
+  .pg[data-pg-state="running"] .pg-dot::after {
+    opacity: 0.3;
+    transform: scale(1.9);
+  }
+}
+.pg-editor {
+  max-height: 420px;
+  overflow: auto;
+}
+.pg-editor .cm-editor {
+  background: var(--color-panel);
+}
+/* Diagram-only embed: the machine is the point, not its source. The fallback
+   <pre> goes too, so a no-JS reader is not shown code the post never discusses. */
+.pg[data-pg-code="hidden"] .pg-editor,
+.pg[data-pg-code="hidden"] .pg-tabs,
+.pg[data-pg-code="hidden"] [data-pg-fallback] {
+  display: none;
+}
+/* Output region: exactly one face is visible — attached DOM, console, or the
+   error report. An error replaces whichever output the snippet was using. */
+.pg-out {
+  border-top: 1px solid var(--color-rule);
+}
+.pg-target {
+  padding: 1rem;
+}
+.pg-console,
+.pg-error {
+  display: none;
+}
+.pg-console {
+  padding: 0.75rem 1rem;
+  max-height: 260px;
+  overflow: auto;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: var(--color-ink);
+}
+.pg-line {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.pg-line-warn {
+  color: var(--syn-const);
+}
+.pg-line-error {
+  color: var(--color-accent);
+}
+.pg-line-debug {
+  color: var(--color-ink-mute);
+}
+.pg-error {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  overflow: auto;
+  white-space: pre-wrap;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--color-accent);
+}
+.pg[data-pg-output="console"] .pg-target {
+  display: none;
+}
+.pg[data-pg-output="console"] .pg-console {
+  display: block;
+}
+.pg[data-pg-state="error"] .pg-target,
+.pg[data-pg-state="error"] .pg-console {
+  display: none;
+}
+.pg[data-pg-state="error"] .pg-error {
+  display: block;
+}
+[data-pg-fallback] {
+  margin: 0;
+  padding: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  white-space: pre;
+  overflow: auto;
+  color: var(--color-ink);
+}
+
+/* Editor token colours. `classHighlighter` emits these stable class names, so
+   the palette drives them from CSS and they flip with the theme for free.
+   Plain identifiers/properties intentionally keep the editor's default ink. */
+.pg-editor .tok-comment {
+  color: var(--syn-comment);
+}
+.pg-editor .tok-keyword {
+  color: var(--syn-keyword);
+}
+.pg-editor .tok-string,
+.pg-editor .tok-string2 {
+  color: var(--syn-string);
+}
+.pg-editor .tok-number,
+.pg-editor .tok-bool,
+.pg-editor .tok-atom,
+.pg-editor .tok-literal {
+  color: var(--syn-const);
+}
+.pg-editor .tok-typeName,
+.pg-editor .tok-className,
+.pg-editor .tok-namespace,
+.pg-editor .tok-macroName {
+  color: var(--syn-type);
+}
+.pg-editor .tok-operator,
+.pg-editor .tok-punctuation {
+  color: var(--ink-mute);
+}
+.pg-editor .tok-invalid {
+  color: var(--syn-keyword);
+  text-decoration: underline wavy;
+}
+
+/* Machine flow diagrams (`@pg/flow`). React Flow's base.css is fetched at
+   runtime by the library and only handles geometry; every colour here comes from
+   the palette. Nodes are positioned with `transform`, so nothing below may
+   animate `transform` on `.pgf-node` itself — the rings are pseudo-elements. */
+.pgf-canvas {
+  width: 100%;
+  --xy-edge-stroke-default: var(--color-rule-strong);
+  --xy-edge-stroke-width-default: 1.5;
+}
+/* Inert canvas: no handles, no grab cursor. */
+.pgf-canvas .react-flow__handle {
+  opacity: 0;
+  pointer-events: none;
+}
+.pgf-canvas .react-flow__pane {
+  cursor: default;
+}
+.pgf-canvas .react-flow__edge-textwrapper {
+  pointer-events: none;
+}
+
+.pgf-node {
+  padding: 0.3rem 0.75rem;
+  min-width: 74px;
+  border: 1px solid var(--color-rule-strong);
+  border-radius: 0.375rem;
+  background: var(--color-panel);
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  text-align: center;
+  transition:
+    color 200ms ease,
+    border-color 200ms ease,
+    background-color 200ms ease;
+}
+/* Entry marker for the initial state. */
+.pgf-initial::before {
+  content: "";
+  position: absolute;
+  left: -0.85rem;
+  top: 50%;
+  width: 0.35rem;
+  height: 0.35rem;
+  margin-top: -0.175rem;
+  border-radius: 50%;
+  background: var(--color-ink-mute);
+}
+.pgf-success {
+  color: var(--syn-string);
+  border-color: var(--syn-string);
+}
+.pgf-failure {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+/* Current state: tinted, outlined in its own hue, with a pinging ring. */
+.pgf-normal.pgf-active {
+  color: var(--color-accent);
+}
+.pgf-active {
+  border-color: currentColor;
+  background: color-mix(in oklch, currentColor 12%, var(--color-panel));
+}
+.pgf-active::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 0.5rem;
+  border: 1px solid currentColor;
+  opacity: 0;
+  animation: pgf-ping 1.6s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+@keyframes pgf-ping {
+  0% {
+    transform: scale(0.96);
+    opacity: 0.5;
+  }
+  70%, 100% {
+    transform: scale(1.12);
+    opacity: 0;
+  }
+}
+/* Landing in a terminal state should read differently from passing through. */
+.pgf-success.pgf-active {
+  animation: pgf-land 0.5s ease-out 1;
+}
+.pgf-failure.pgf-active {
+  animation: pgf-shake 0.4s ease-in-out 2;
+}
+@keyframes pgf-land {
+  0% {
+    background-color: var(--color-panel);
+  }
+  40% {
+    background-color: color-mix(in oklch, currentColor 34%, var(--color-panel));
+  }
+  100% {
+    background-color: color-mix(in oklch, currentColor 12%, var(--color-panel));
+  }
+}
+@keyframes pgf-shake {
+  0%, 100% {
+    border-color: currentColor;
+  }
+  50% {
+    border-color: var(--color-panel);
+  }
+}
+
+/* Edges: muted by default, accent plus marching ants while their source is
+   live, and a thick flash on the transition just taken. */
+.pgf-canvas .react-flow__edge-path {
+  transition: stroke 200ms ease;
+}
+.pgf-canvas .pgf-edge-live .react-flow__edge-path {
+  stroke: var(--color-accent);
+}
+.pgf-canvas .pgf-edge-taken .react-flow__edge-path {
+  animation: pgf-edge-flash 0.6s ease-out 1;
+}
+@keyframes pgf-edge-flash {
+  0% {
+    stroke-width: 4.5;
+    stroke: var(--color-accent);
+  }
+  100% {
+    stroke-width: 1.5;
+  }
+}
+.pgf-canvas .react-flow__edge-text {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.04em;
+  fill: var(--color-ink-mute);
+}
+.pgf-canvas .react-flow__edge-textbg {
+  fill: var(--color-panel);
+}
+.pgf-canvas .pgf-edge-live .react-flow__edge-text {
+  fill: var(--color-accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pgf-active::after,
+  .pgf-success.pgf-active,
+  .pgf-failure.pgf-active,
+  .pgf-canvas .pgf-edge-taken .react-flow__edge-path {
+    animation: none;
+  }
+  .pgf-canvas .react-flow__edge.animated path {
+    animation: none;
+  }
+  .pgf-active::after {
+    opacity: 0.4;
+  }
+}
+
+/* Attribution as chrome under the canvas. Inside the canvas it is an
+   absolutely-positioned overlay that covers edges and cannot be made legible
+   without also masking the diagram. */
+.pgf-credit {
+  margin: 0.75rem 0 0;
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-ink-mute);
+}
+.pgf-credit a {
+  color: var(--color-ink-mute);
+  text-decoration: none;
+  transition: color 120ms ease;
+}
+.pgf-credit a:hover {
+  color: var(--color-accent);
+}
+
+/* Controls an embed supplies inside its output region. */
+.pg-target button {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  padding: 0.25rem 0.6rem;
+  margin: 0 0.35rem 0 0;
+  border: 1px solid var(--color-rule-strong);
+  border-radius: 0.25rem;
+  background: var(--color-panel);
+  color: var(--color-ink);
+  cursor: pointer;
+  transition: color 120ms ease, border-color 120ms ease;
+}
+.pg-target button:hover {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+/* Status line an embed supplies beside its controls. The reserved height keeps
+   the diagram above from shifting the first time a line is written. */
+.pg-log {
+  margin: 0.75rem 0 0;
+  min-height: 1.2em;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.2;
+  color: var(--color-ink-mute);
 }
