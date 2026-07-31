@@ -154,9 +154,7 @@ function expand(
   tabsWrap.setAttribute("class", "pg-tabs");
   tabsWrap.setAttribute("data-pg-tabs", "");
   bar.appendChild(tabsWrap);
-  // No browser OCaml formatter exists, so that language gets no Format control
-  // rather than one that always fails.
-  if (lang !== "ocaml") bar.appendChild(buildFormatButton(doc));
+  bar.appendChild(buildFormatButton(doc));
   bar.appendChild(buildRunButton(doc, lang !== "ts"));
   bar.appendChild(buildStateChip(doc));
   section.appendChild(bar);

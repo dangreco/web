@@ -4,17 +4,21 @@
 // would fuse both into whichever chunk this lands in, which is exactly what the
 // dynamic imports below avoid.
 //
-// OCaml is absent by design. No browser-capable OCaml formatter is published, so
-// the build plugin omits its Format button rather than offering one that fails.
+// OCaml has no browser-capable formatter published anywhere, so it uses a
+// hand-rolled indenter (see `pg-ocaml-format.ts`) loaded the same lazy way.
+
+import type { PgLang } from "./pg-types.ts";
+import { formatOcaml } from "./pg-ocaml-format.ts";
 
 interface CljFmt {
   formatWithConfig(source: string, config: null): string;
 }
 
 export async function formatSource(
-  lang: "ts" | "clojure",
+  lang: PgLang,
   source: string,
 ): Promise<string> {
+  if (lang === "ocaml") return formatOcaml(source);
   if (lang === "clojure") {
     const mod = await import(
       "https://esm.sh/prettier-plugin-cljfmt@0.1.1/dist/cljfmt.js"

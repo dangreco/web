@@ -468,9 +468,9 @@ export function initPlayground(
     : lang === "clojure"
     ? clojure()
     : javascript({ typescript: true });
-  // Shift+Alt+F is the editor-standard binding, and the bar button runs the same
-  // path. OCaml has no formatter, so it contributes nothing.
-  const formatKeys: Extension = lang === "ocaml" ? [] : keymap.of([{
+  // Shift+Alt+F is the editor-standard binding; the bar button runs the same
+  // path. Every language has a formatter now (OCaml via a hand-rolled indenter).
+  const formatKeys: Extension = keymap.of([{
     key: "Shift-Alt-f",
     run: () => {
       void formatDoc();
@@ -562,11 +562,11 @@ export function initPlayground(
    * formatter that cannot parse the source has nothing useful to write.
    */
   async function formatDoc(): Promise<void> {
-    if (lang === "ocaml") return;
     const before = view.state.doc.toString();
     try {
       // Lazy for the same reason as the runners: prettier is over a megabyte and
-      // most readers never press the button.
+      // most readers never press the button. OCaml's indenter is tiny but rides
+      // the same chunk so nothing here loads eagerly.
       const { formatSource } = await import("./pg-format.ts");
       const after = await formatSource(lang, before);
       if (after === before) return;
