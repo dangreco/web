@@ -51,18 +51,24 @@ function ensure(section: HTMLElement, run: boolean): void {
 }
 
 function setup(section: HTMLElement): void {
+  // TypeScript embeds are the post's illustrations, so they auto-run when
+  // scrolled into view. The interpreted languages mount their editor the same
+  // way but wait for an explicit Run: each pulls a multi-megabyte language
+  // runtime off a CDN, which no reader should pay for merely by scrolling past.
+  const autoRun = (section.getAttribute("data-pg-lang") ?? "ts") === "ts";
+
   // Clicking Run before preload still loads + runs (autoRun) on first use.
   section.querySelector<HTMLButtonElement>("[data-pg-run]")
     ?.addEventListener("click", () => ensure(section, true));
 
   if (typeof IntersectionObserver === "undefined") {
-    ensure(section, true);
+    ensure(section, autoRun);
     return;
   }
   const io = new IntersectionObserver((entries) => {
     for (const entry of entries) {
       if (entry.isIntersecting) {
-        ensure(section, true);
+        ensure(section, autoRun);
         io.disconnect();
       }
     }
