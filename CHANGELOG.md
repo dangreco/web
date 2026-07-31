@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.6.0](https://github.com/dangreco/web/compare/v0.5.0...v0.6.0) (2026-07-31)
+
+
+### Features
+
+* runnable OCaml/ClojureScript playgrounds, editor intelligence, and charts ([#40](https://github.com/dangreco/web/issues/40)) ([f785e6c](https://github.com/dangreco/web/commit/f785e6cb12dc07b89d4c95f1ba46ef398f10ca26))
+
+
+### Dependencies
+
+* **deps:** bump actions/checkout from 7.0.0 to 7.0.1 ([#34](https://github.com/dangreco/web/issues/34)) ([552ab87](https://github.com/dangreco/web/commit/552ab87610a5d23e825ce388efd65b1363563ae9))
+* **deps:** bump actions/create-github-app-token from 2.2.2 to 3.2.0 ([#32](https://github.com/dangreco/web/issues/32)) ([c35b366](https://github.com/dangreco/web/commit/c35b366329b498b81fd4b64b400e71d281c250df))
+* **deps:** bump docker/login-action from 4.4.0 to 4.5.1 ([#35](https://github.com/dangreco/web/issues/35)) ([8a05e27](https://github.com/dangreco/web/commit/8a05e278a21a27d848235450e42c81ef85255593))
+* **deps:** bump docker/metadata-action from 5.10.0 to 6.2.0 ([#31](https://github.com/dangreco/web/issues/31)) ([09a3488](https://github.com/dangreco/web/commit/09a3488cdd22f7fd5dc53393c54c554ddf2f3ac8))
+* **deps:** bump googleapis/release-please-action from 4.4.1 to 5.0.0 ([#33](https://github.com/dangreco/web/issues/33)) ([474d1f9](https://github.com/dangreco/web/commit/474d1f9d5ed3769458c9362660151386d4545e29))
+
 ## [0.5.0](https://github.com/dangreco/web/compare/v0.4.0...v0.5.0) (2026-07-30)
 
 
