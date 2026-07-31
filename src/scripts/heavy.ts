@@ -649,9 +649,9 @@ export function initPlayground(
     // Charts drawn during evaluation land in the section's plot pane. Errors in
     // a single chart must not abort the run, so they are reported to devtools
     // and skipped.
-    const plot: PlotFn = (kind, data) => {
+    const plot: PlotFn = (kind, data, opts) => {
       try {
-        chartCleanups.push(renderChart(plotsEl, kind, data));
+        chartCleanups.push(renderChart(plotsEl, kind, data, opts));
       } catch (err) {
         console.error("[playground] plot failed", err);
       }

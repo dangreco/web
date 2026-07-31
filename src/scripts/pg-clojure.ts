@@ -10,6 +10,7 @@
 
 import type {
   ChartKind,
+  ChartOptions,
   ForeignRunner,
   PlotFn,
   RunOutcome,
@@ -45,16 +46,24 @@ const PATCHED = ["log", "info", "warn", "debug"] as const;
 // Where the runtime installs the chart sink for the duration of an evaluation;
 // the prelude's `bar`/`line`/`scatter` reach it through `js/__pgPlot`.
 const host = globalThis as unknown as {
-  __pgPlot?: (kind: ChartKind, data: string) => void;
+  __pgPlot?: (
+    kind: ChartKind,
+    data: string,
+    opts?: string,
+  ) => void;
 };
 
-// Defines `bar`/`line`/`scatter` in the shared sci context. Each hands its
-// argument to the host as JS-then-JSON, so any Clojure data shape the renderer
-// accepts is fair game.
+// Defines `bar`/`line`/`scatter` in the shared sci context, each with an optional
+// options map: `(bar data)`, `(bar data {:title "..."})`. `__pg` stringifies the
+// data (and the options, when given) and hands them to the host global.
 const PRELUDE = "(do" +
-  ' (def bar (fn [d] (js/__pgPlot "bar" (js/JSON.stringify (cljs.core/clj->js d)))))' +
-  ' (def line (fn [d] (js/__pgPlot "line" (js/JSON.stringify (cljs.core/clj->js d)))))' +
-  ' (def scatter (fn [d] (js/__pgPlot "scatter" (js/JSON.stringify (cljs.core/clj->js d))))))';
+  " (defn __pg [kind d o]" +
+  " (let [dj (js/JSON.stringify (cljs.core/clj->js d))]" +
+  " (if o (js/__pgPlot kind dj (js/JSON.stringify (cljs.core/clj->js o)))" +
+  " (js/__pgPlot kind dj))))" +
+  ' (def bar (fn ([d] (__pg "bar" d nil)) ([d o] (__pg "bar" d o))))' +
+  ' (def line (fn ([d] (__pg "line" d nil)) ([d o] (__pg "line" d o))))' +
+  ' (def scatter (fn ([d] (__pg "scatter" d nil)) ([d o] (__pg "scatter" d o)))))';
 
 // One interpreter per page, not per section: scittle installs itself on a global
 // and there is nothing to gain from a second copy.
@@ -130,9 +139,14 @@ export function createRunner(): ForeignRunner {
       // `scatter`; restored alongside the console in `finally`.
       const prevPlot = host.__pgPlot;
       if (plot) {
-        host.__pgPlot = (kind, json) => {
+        host.__pgPlot = (kind, djson, ojson) => {
           try {
-            plot(kind, JSON.parse(json));
+            // The opts map, when present, is a JSON string from clj->js;
+            // otherwise the call carried only data.
+            const opts: ChartOptions | undefined = ojson
+              ? (JSON.parse(ojson) as ChartOptions)
+              : undefined;
+            plot(kind, JSON.parse(djson), opts);
           } catch (err) {
             console.error("[playground] clojure plot failed", err);
           }

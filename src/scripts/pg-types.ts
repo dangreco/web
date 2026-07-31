@@ -33,8 +33,24 @@ export interface RunOutcome {
 /** Chart kinds the runtime can draw. */
 export type ChartKind = "bar" | "line" | "scatter";
 
+/** Options a chart call may carry; shared so the runtime's plot sink and the
+ * `@pg/charts` API agree on the shape. */
+export interface ChartOptions {
+  title?: string;
+  /** Plot height in CSS pixels. Default 240. */
+  height?: number;
+  xLabel?: string;
+  yLabel?: string;
+  /** Fill/stroke colour. Defaults to the palette accent. */
+  color?: string;
+}
+
 /** Hands a drawn chart to the runtime, which renders it into the plot pane. */
-export type PlotFn = (kind: ChartKind, data: unknown) => void;
+export type PlotFn = (
+  kind: ChartKind,
+  data: unknown,
+  opts?: ChartOptions,
+) => void;
 
 /**
  * A non-TypeScript evaluator. `load()` is idempotent and pulls the language's

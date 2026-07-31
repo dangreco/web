@@ -15,6 +15,7 @@
 
 import type {
   ChartKind,
+  ChartOptions,
   ForeignRunner,
   PlotFn,
   RunDiagnostic,
@@ -77,23 +78,26 @@ self.onmessage = function (e) {
 `;
 
 /**
- * Defines `Plot.bar/line/scatter` in the toplevel. Each takes plain OCaml lists,
- * JSON-encodes them here, and writes a single `__PG_PLOT__<kind>[json]` line to
- * stdout. `%g` keeps numbers valid as JSON (no trailing dot); `%S` quotes label
- * strings in a JSON-compatible way for the common cases. The kind sits directly
- * ahead of the JSON's opening `[`, so the runner can split the two without a
- * delimiter that would need escaping.
+ * Defines `Plot.bar/line/scatter` in the toplevel, each taking an optional
+ * `?title`. A call writes one `__PG_PLOT__{...}` line to stdout whose body is a
+ * JSON object `{kind,data,opts}` — parsed on the main thread and rendered.
+ *
+ * The encoder never embeds a double-quote in an OCaml literal: keys and string
+ * values go through `%S`, which quotes them, so the prelude has no backslash
+ * escapes to fight the TS string that carries it. `%g` keeps numbers valid JSON.
  */
 const PRELUDE = [
-  'let __pg_emit kind json = print_endline ("' + PLOT_PREFIX +
-  '" ^ kind ^ json);;',
   'let __pg_num v = Printf.sprintf "%g" v;;',
   'let __pg_json_pairs labels values = "[" ^ String.concat "," (List.map2 (fun l v -> Printf.sprintf "[%S,%s]" l (__pg_num v)) labels values) ^ "]";;',
   'let __pg_json_xy xs ys = "[" ^ String.concat "," (List.map2 (fun x y -> Printf.sprintf "[%s,%s]" (__pg_num x) (__pg_num y)) xs ys) ^ "]";;',
+  'let __pg_obj pairs = "{" ^ String.concat "," (List.map (fun (k, v) -> Printf.sprintf "%S" k ^ ":" ^ v) pairs) ^ "}";;',
+  'let __pg_emit kind ?title data = let opts = match title with None -> __pg_obj [] | Some t -> __pg_obj [("title", Printf.sprintf "%S" t)] in print_endline ("' +
+  PLOT_PREFIX +
+  '" ^ __pg_obj [("kind", Printf.sprintf "%S" kind); ("data", data); ("opts", opts)]);;',
   "module Plot = struct",
-  '  let bar ~labels ~values = __pg_emit "bar" (__pg_json_pairs labels values)',
-  '  let line xs ys = __pg_emit "line" (__pg_json_xy xs ys)',
-  '  let scatter xs ys = __pg_emit "scatter" (__pg_json_xy xs ys)',
+  '  let bar ?title ~labels ~values = __pg_emit "bar" ?title (__pg_json_pairs labels values)',
+  '  let line ?title xs ys = __pg_emit "line" ?title (__pg_json_xy xs ys)',
+  '  let scatter ?title xs ys = __pg_emit "scatter" ?title (__pg_json_xy xs ys)',
   "end;;",
 ].join("\n");
 
@@ -123,14 +127,17 @@ function report(
   const lines = msg.stdout.split("\n");
   if (lines.at(-1) === "") lines.pop();
   for (const line of lines) {
-    // A plot request hiding in stdout: kind runs up to the JSON's first `[`,
-    // the rest is the data. Rendered on the main thread, kept out of the pane.
+    // A plot request hiding in stdout: the body after the prefix is a JSON
+    // object `{kind,data,opts}`. Rendered on the main thread, kept off the pane.
     if (line.startsWith(PLOT_PREFIX)) {
-      const rest = line.slice(PLOT_PREFIX.length);
-      const lb = rest.indexOf("[");
-      if (lb > 0 && plot) {
+      if (plot) {
         try {
-          plot(rest.slice(0, lb) as ChartKind, JSON.parse(rest.slice(lb)));
+          const payload = JSON.parse(line.slice(PLOT_PREFIX.length)) as {
+            kind: ChartKind;
+            data: unknown;
+            opts?: ChartOptions;
+          };
+          plot(payload.kind, payload.data, payload.opts);
         } catch (err) {
           console.error("[playground] ocaml plot failed", err);
         }

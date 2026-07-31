@@ -17,17 +17,13 @@
 // Run). `renderChart` is the target-explicit core the runtime also calls for the
 // interpreted languages.
 
-const SVG_NS = "http://www.w3.org/2000/svg";
+// Chart options are defined once in the shared type module (the runtime's
+// `PlotFn` carries them too) and re-exported here so `@pg/charts` users see the
+// same type. Type-only, so it erases when the snippet is bundled in-page.
+import type { ChartOptions } from "../../scripts/pg-types.ts";
+export type { ChartOptions };
 
-export interface ChartOptions {
-  title?: string;
-  /** Plot height in CSS pixels. Default 240. */
-  height?: number;
-  xLabel?: string;
-  yLabel?: string;
-  /** Fill/stroke colour. Defaults to the palette accent. */
-  color?: string;
-}
+const SVG_NS = "http://www.w3.org/2000/svg";
 
 interface Palette {
   accent: string;
