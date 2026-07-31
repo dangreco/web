@@ -30,16 +30,19 @@ const site = lume({
 });
 
 // Bundle client-side TS (playground runtime). Splitting is opt-in in esbuild;
-// enabling it lets `import("./heavy.ts")` lazy-load as a sibling chunk. esm.sh
-// imports stay external: the browser fetches the correct browser-targeted
-// modules at runtime, and Lume's Deno loader avoids both the global-cache write
-// and Deno-targeted (node:) builds it would otherwise pull.
+// enabling it lets every `import("./pg-*.ts")` in the runtime lazy-load as a
+// sibling chunk — the editor, the OCaml and Clojure evaluators, the formatters
+// and the TypeScript language service each arrive only when used, hence the
+// neutral `pg-` chunk prefix rather than naming them all after one of them.
+// esm.sh imports stay external: the browser fetches the correct
+// browser-targeted modules at runtime, and Lume's Deno loader avoids both the
+// global-cache write and Deno-targeted (node:) builds it would otherwise pull.
 site.use(
   esbuild({
     options: {
       splitting: true,
       keepNames: false, // avoid an extra shared helper chunk for this tiny runtime
-      chunkNames: "scripts/heavy-[hash]",
+      chunkNames: "scripts/pg-[hash]",
       external: ["https://esm.sh/*"],
     },
   }),

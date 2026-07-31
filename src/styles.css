@@ -245,8 +245,9 @@ code[data-line-numbers="false"] .line::before {
   background: var(--color-rule);
 }
 
-/* Run control: icon-only, transparent, muted until hovered. */
-.pg-run {
+/* Run and Format controls: icon-only, transparent, muted until hovered. */
+.pg-run,
+.pg-format {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -259,15 +260,35 @@ code[data-line-numbers="false"] .line::before {
   flex: none;
   transition: color 120ms ease, opacity 120ms ease;
 }
-.pg-run:hover:not(:disabled) {
+.pg-run:hover:not(:disabled),
+.pg-format:hover:not(:disabled) {
   color: var(--color-ink);
 }
-.pg-run:disabled {
+.pg-run:disabled,
+.pg-format:disabled {
   opacity: 0.4;
+}
+/* Run is only ever disabled mid-run; Format only before the editor exists, and
+   waiting for a chunk to arrive is not progress the reader made. */
+.pg-run:disabled {
   cursor: progress;
 }
-.pg-run svg {
+.pg-format:disabled {
+  cursor: default;
+}
+.pg-run svg,
+.pg-format svg {
   display: block;
+}
+
+/* Labelled variant: the interpreted languages never auto-run, so their control
+   says as much in words rather than trusting a glyph to imply it. */
+.pg-run-labeled {
+  gap: 0.35rem;
+  padding: 0.15rem 0.5rem;
+}
+.pg-run-labeled span {
+  letter-spacing: 0.02em;
 }
 
 /* State chip, pinned to the right of the bar. The section carries the state as
@@ -297,6 +318,11 @@ code[data-line-numbers="false"] .line::before {
   --pg-dot: var(--syn-type);
 }
 .pg[data-pg-state="running"] {
+  --pg-dot: var(--syn-string);
+}
+/* Finished: the same green as running, and deliberately no ping below — an
+   evaluated snippet is settled, not live. */
+.pg[data-pg-state="done"] {
   --pg-dot: var(--syn-string);
 }
 .pg[data-pg-state="error"] {
@@ -366,17 +392,17 @@ code[data-line-numbers="false"] .line::before {
     transform: scale(1.9);
   }
 }
-.pg-editor {
-  max-height: 420px;
-  overflow: auto;
-}
+/* No height cap on this wrapper by design: the cap and the scrolling live in the
+   CodeMirror theme, because an `overflow: auto` wrapper clips tooltips. */
 .pg-editor .cm-editor {
   background: var(--color-panel);
 }
 /* Diagram-only embed: the machine is the point, not its source. The fallback
-   <pre> goes too, so a no-JS reader is not shown code the post never discusses. */
+   <pre> goes too, so a no-JS reader is not shown code the post never discusses,
+   and Format goes with it — there is no visible editor to format. */
 .pg[data-pg-code="hidden"] .pg-editor,
 .pg[data-pg-code="hidden"] .pg-tabs,
+.pg[data-pg-code="hidden"] .pg-format,
 .pg[data-pg-code="hidden"] [data-pg-fallback] {
   display: none;
 }
@@ -478,6 +504,44 @@ code[data-line-numbers="false"] .line::before {
 .pg-editor .tok-invalid {
   color: var(--syn-keyword);
   text-decoration: underline wavy;
+}
+
+/* Diagnostics from the type checker and from a failed evaluation. @codemirror/lint
+   hard-codes a red data-URI squiggle; override it so an error reads in the site's
+   palette like every other accent. */
+.pg-editor .cm-lintRange-error {
+  background-image: none;
+  text-decoration: underline wavy var(--color-accent);
+  text-decoration-skip-ink: none;
+}
+.pg-editor .cm-lintRange-warning {
+  background-image: none;
+  text-decoration: underline wavy var(--syn-const);
+  text-decoration-skip-ink: none;
+}
+
+/* Tooltips: the lint message and the hover type both render as .cm-tooltip
+   inside the editor, so they share the panel language of the .pg container. */
+.pg-editor .cm-tooltip {
+  background: var(--color-panel);
+  border: 1px solid var(--color-rule-strong);
+  border-radius: 0.25rem;
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  max-width: 42ch;
+}
+.pg-editor .cm-tooltip .cm-diagnostic {
+  padding: 0.35rem 0.5rem;
+  border-left: none;
+}
+.pg-editor .pg-tip {
+  padding: 0.35rem 0.5rem;
+  white-space: pre-wrap;
+}
+.pg-editor .pg-tip-doc {
+  margin-top: 0.35rem;
+  color: var(--color-ink-mute);
 }
 
 /* Machine flow diagrams (`@pg/flow`). React Flow's base.css is fetched at

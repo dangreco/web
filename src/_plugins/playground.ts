@@ -1,5 +1,8 @@
 import type Site from "lume/core/site.ts";
 import { posix } from "lume/deps/path.ts";
+// The runtime reads `data-pg-lang` back off the section, so the set of
+// languages has one definition and both sides move together.
+import type { PgLang } from "../scripts/pg-types.ts";
 
 const LOADER_SRC = "/scripts/playground.js";
 const LIB_DIR = "_playground/lib";
@@ -49,6 +52,21 @@ export default function playground() {
   };
 }
 
+// Language is inferred from the entry file's extension rather than from a new
+// attribute: `entry` already exists and already defaults to `index.ts`, so an
+// OCaml embed is simply `entry="main.ml"`.
+const LANG_BY_EXT: Record<string, PgLang> = {
+  ".ts": "ts",
+  ".tsx": "ts",
+  ".js": "ts",
+  ".jsx": "ts",
+  ".ml": "ocaml",
+  ".mli": "ocaml",
+  ".clj": "clojure",
+  ".cljs": "clojure",
+  ".cljc": "clojure",
+};
+
 function expand(
   site: Site,
   doc: Document,
@@ -65,6 +83,13 @@ function expand(
 
   const entry = el.getAttribute("entry") ?? "index.ts";
   const id = el.getAttribute("id");
+
+  const lang: PgLang | undefined =
+    LANG_BY_EXT[posix.extname(entry).toLowerCase()];
+  if (!lang) {
+    console.error(`[playground] unsupported entry extension: ${entry}`);
+    return false;
+  }
 
   // The co-located resource dir is the post's own directory:
   //   /blog/posts/2026-07-28_safe_state_machines
@@ -94,6 +119,16 @@ function expand(
     return false;
   }
 
+  // OCaml and Clojure snippets are evaluated as a single source string; neither
+  // runtime has a module story here, so quietly ignoring the extra files would
+  // be a trap. Fail the embed the same way a missing directory does.
+  if (lang !== "ts" && names.length > 1) {
+    console.error(
+      `[playground] ${lang} snippets must be single-file, found ${names.length} in ${absDir}`,
+    );
+    return false;
+  }
+
   const entryText = files[entry] ?? "";
 
   const section = doc.createElement("section");
@@ -101,6 +136,7 @@ function expand(
   section.setAttribute("data-pg", "");
   if (id) section.setAttribute("data-pg-id", id);
   section.setAttribute("data-pg-entry", entry);
+  section.setAttribute("data-pg-lang", lang);
   section.setAttribute("data-pg-state", "idle");
   // `code="hidden"` yields a diagram-only embed: the machine is the point, not
   // its source. CSS hides the editor and tabs; the editor is still constructed,
@@ -118,7 +154,10 @@ function expand(
   tabsWrap.setAttribute("class", "pg-tabs");
   tabsWrap.setAttribute("data-pg-tabs", "");
   bar.appendChild(tabsWrap);
-  bar.appendChild(buildRunButton(doc));
+  // No browser OCaml formatter exists, so that language gets no Format control
+  // rather than one that always fails.
+  if (lang !== "ocaml") bar.appendChild(buildFormatButton(doc));
+  bar.appendChild(buildRunButton(doc, lang !== "ts"));
   bar.appendChild(buildStateChip(doc));
   section.appendChild(bar);
 
@@ -135,8 +174,15 @@ function expand(
 
   // Output mode is implied by the embed: markup supplied by the author means the
   // snippet paints into the DOM, while an empty embed means it speaks through
-  // console. Read before the children move out.
-  const mode = el.children.length > 0 ? "dom" : "console";
+  // console. Read before the children move out. The interpreted languages get no
+  // DOM handle, so they are console-only whatever the author wrote.
+  let mode = el.children.length > 0 ? "dom" : "console";
+  if (lang !== "ts" && mode === "dom") {
+    console.warn(
+      `[playground] ${lang} embeds are console-only; ignoring markup in snippet ${snippet}`,
+    );
+    mode = "console";
+  }
   section.setAttribute("data-pg-output", mode);
 
   // One output region holding all three faces — attached DOM, console, and the
@@ -168,7 +214,10 @@ function expand(
   const json = doc.createElement("script");
   json.setAttribute("type", "application/json");
   json.setAttribute("data-pg-files", "");
-  json.textContent = JSON.stringify({ files, entry }).replace(/</g, "\\u003c");
+  json.textContent = JSON.stringify({ files, entry, lang }).replace(
+    /</g,
+    "\\u003c",
+  );
   section.appendChild(json);
 
   el.replaceWith(section);
@@ -201,19 +250,47 @@ function buildStateChip(doc: Document): HTMLElement {
 }
 
 /**
- * Run control: an icon-only play button at the right of the tab bar. The glyph
- * is decorative, so the accessible name comes from `aria-label`.
+ * Run control at the right of the tab bar. TypeScript embeds auto-run when
+ * scrolled into view, so their glyph is decorative and the accessible name comes
+ * from `aria-label`. The interpreted languages never auto-run, so their button
+ * carries a visible "Run" — which then *is* the accessible name, and an
+ * `aria-label` beside it would only override the text a reader can see.
  */
-function buildRunButton(doc: Document): HTMLElement {
+function buildRunButton(doc: Document, labeled: boolean): HTMLElement {
   const btn = doc.createElement("button");
   btn.setAttribute("type", "button");
-  btn.setAttribute("class", "pg-run");
+  btn.setAttribute("class", labeled ? "pg-run pg-run-labeled" : "pg-run");
   btn.setAttribute("data-pg-run", "");
-  btn.setAttribute("aria-label", "Run snippet");
+  if (!labeled) btn.setAttribute("aria-label", "Run snippet");
   btn.setAttribute("title", "Run");
   btn.innerHTML = '<svg viewBox="0 0 16 16" width="12" height="12" ' +
     'aria-hidden="true" focusable="false">' +
     '<path d="M5 3.4v9.2l7.2-4.6L5 3.4Z" fill="currentColor"/></svg>';
+  if (labeled) {
+    const label = doc.createElement("span");
+    label.textContent = "Run";
+    btn.appendChild(label);
+  }
+  return btn;
+}
+
+/**
+ * Format control. Rendered `disabled`: formatting needs the mounted editor, and
+ * the runtime enables the button once it has one — so a click before the heavy
+ * chunk lands is impossible rather than queued.
+ */
+function buildFormatButton(doc: Document): HTMLElement {
+  const btn = doc.createElement("button");
+  btn.setAttribute("type", "button");
+  btn.setAttribute("class", "pg-format");
+  btn.setAttribute("data-pg-format", "");
+  btn.setAttribute("disabled", "");
+  btn.setAttribute("aria-label", "Format code");
+  btn.setAttribute("title", "Format (Shift+Alt+F)");
+  btn.innerHTML = '<svg viewBox="0 0 16 16" width="12" height="12" ' +
+    'aria-hidden="true" focusable="false">' +
+    '<path d="M2 3.5h12M2 7h8M2 10.5h12M2 14h8" stroke="currentColor" ' +
+    'stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>';
   return btn;
 }
 
