@@ -19,6 +19,10 @@ import {
   type Text,
 } from "https://esm.sh/@codemirror/state@6.7.1";
 import { keymap } from "https://esm.sh/@codemirror/view@6.43.7?deps=@codemirror/state@6.7.1";
+// `indentWithTab` is the one piece basicSetup omits: without it Tab leaves the
+// editor and moves focus, which is the last thing a reader editing a snippet
+// expects. Pinned to the shared instance the editor already resolves.
+import { indentWithTab } from "https://esm.sh/@codemirror/commands@6.10.4?deps=@codemirror/language@6.12.4,@codemirror/state@6.7.1,@codemirror/view@6.43.7,@lezer/highlight@1.2.3";
 // `setDiagnostics` installs the lint state field on demand, so the interpreted
 // languages get squiggles without a `linter()` source polling for them.
 import {
@@ -482,6 +486,7 @@ export function initPlayground(
   const buildExtensions = () =>
     [
       basicSetup,
+      keymap.of([indentWithTab]),
       langMode,
       syntaxHighlighting(classHighlighter),
       formatKeys,
