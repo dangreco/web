@@ -544,6 +544,107 @@ code[data-line-numbers="false"] .line::before {
   color: var(--color-ink-mute);
 }
 
+/* Plot output: charts from any language render here. An empty pane collapses to
+   nothing, and an error replaces plots just as it replaces every other face. */
+.pg-plots:empty {
+  display: none;
+}
+.pg-plots {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+}
+.pg[data-pg-state="error"] .pg-plots {
+  display: none;
+}
+
+/* Hand-rolled SVG charts (`@pg/charts` / Plot.* / bar-line-scatter). Every
+   colour comes from the palette, so a theme flip re-renders correctly. */
+.pgc {
+  position: relative;
+  width: 100%;
+}
+.pgc-svg {
+  display: block;
+  width: 100%;
+  overflow: visible;
+}
+.pgc-grid {
+  stroke: var(--color-rule);
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+.pgc-grid-v {
+  opacity: 0.55;
+}
+.pgc-axisline {
+  stroke: var(--color-rule-strong);
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+.pgc-axis,
+.pgc-axislabel,
+.pgc-empty {
+  fill: var(--color-ink-mute);
+  font-family: var(--font-mono);
+}
+.pgc-axis,
+.pgc-empty {
+  font-size: 10px;
+}
+.pgc-axislabel {
+  font-size: 11px;
+}
+.pgc-title {
+  fill: var(--color-ink);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+}
+.pgc-mark {
+  transition: opacity 120ms ease;
+}
+.pgc-mark:hover {
+  opacity: 0.78;
+}
+.pgc-line {
+  fill: none;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+/* A panel-coloured halo so dots read against an overlapping line or gridline. */
+.pgc-dot {
+  stroke: var(--color-panel);
+  stroke-width: 1.5;
+}
+
+/* Hover tooltip: an HTML overlay absolutely positioned over the chart, updated
+   per mark. Kept pointer-inert so it never steals the hover it is describing. */
+.pgc-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  max-width: 80%;
+  padding: 0.2rem 0.45rem;
+  background: var(--color-ink);
+  color: var(--color-panel);
+  border-radius: 0.25rem;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  white-space: pre;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(2px);
+  transition: opacity 100ms ease, transform 100ms ease;
+  z-index: 1;
+}
+.pgc-tip-show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 /* Machine flow diagrams (`@pg/flow`). React Flow's base.css is fetched at
    runtime by the library and only handles geometry; every colour here comes from
    the palette. Nodes are positioned with `transform`, so nothing below may

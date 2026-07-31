@@ -49,9 +49,13 @@ import type {
   ConsoleLevel,
   ForeignRunner,
   PgLang,
+  PlotFn,
   RunDiagnostic,
   Sink,
 } from "./pg-types.ts";
+// The same module the TS snippets import as `@pg/charts`; the runtime reuses its
+// renderer for the interpreted languages so every language draws identically.
+import { renderChart } from "../_playground/lib/charts.ts";
 // Type-only, so the module itself stays behind the dynamic import below.
 import type { TsIntel } from "./pg-tsintel.ts";
 import * as esbuild from "https://esm.sh/esbuild-wasm@0.25.5";
@@ -393,7 +397,8 @@ export function initPlayground(
   const runBtn = section.querySelector<HTMLButtonElement>("[data-pg-run]");
   const errorOut = section.querySelector<HTMLElement>("[data-pg-error]");
   const target = section.querySelector<HTMLElement>("[data-pg-target]");
-  if (!editorHost || !runBtn || !errorOut || !target) return;
+  const plots = section.querySelector<HTMLElement>("[data-pg-plots]");
+  if (!editorHost || !runBtn || !errorOut || !target || !plots) return;
 
   // Rebind to non-null locals so the closure below keeps its type narrowing
   // (TS won't carry querySelector narrowing into a hoisted function body).
@@ -401,6 +406,7 @@ export function initPlayground(
   const button: HTMLButtonElement = runBtn;
   const errorEl: HTMLElement = errorOut;
   const targetEl: HTMLElement = target;
+  const plotsEl: HTMLElement = plots;
 
   const stateLabel = section.querySelector<HTMLElement>(
     "[data-pg-state-label]",
@@ -575,6 +581,10 @@ export function initPlayground(
 
   // Run
   let cleanup: (() => void) | undefined;
+  // Disposers for charts the interpreted languages draw through the plot
+  // callback (TS charts are the snippet's own responsibility, returned from
+  // `main`). Tracked so a pane clear between Runs also drops their observers.
+  const chartCleanups: (() => void)[] = [];
   const targetSnapshot = targetEl.innerHTML;
 
   async function runTs(): Promise<void> {
@@ -636,7 +646,17 @@ export function initPlayground(
     }
     await runner.load();
     setState("running");
-    const outcome = await runner.run(files.get(entry) ?? "", sink);
+    // Charts drawn during evaluation land in the section's plot pane. Errors in
+    // a single chart must not abort the run, so they are reported to devtools
+    // and skipped.
+    const plot: PlotFn = (kind, data) => {
+      try {
+        chartCleanups.push(renderChart(plotsEl, kind, data));
+      } catch (err) {
+        console.error("[playground] plot failed", err);
+      }
+    };
+    const outcome = await runner.run(files.get(entry) ?? "", sink, plot);
     if (outcome.ok) {
       // Unlike a TS snippet, an evaluated one is over. Say so.
       setState("done");
@@ -656,7 +676,13 @@ export function initPlayground(
   async function run(): Promise<void> {
     button.disabled = true;
     if (consoleOut) consoleOut.textContent = "";
-    // Squiggles from the last evaluation are stale the moment this one starts.
+    for (const c of chartCleanups) c();
+    chartCleanups.length = 0;
+    plotsEl.textContent = "";
+    // TS charts (`@pg/charts`) draw into whichever section is running, found
+    // through this global; the interpreted languages reach the same pane via the
+    // plot callback handed to their runner.
+    globalScope.__pgPlotPane = plotsEl;
     // TypeScript sections are left alone: their diagnostics come from the type
     // checker, and clearing the lint field here would erase them until the next
     // keystroke re-triggered it.

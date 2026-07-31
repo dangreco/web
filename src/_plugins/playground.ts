@@ -185,7 +185,7 @@ function expand(
   }
   section.setAttribute("data-pg-output", mode);
 
-  // One output region holding all three faces — attached DOM, console, and the
+  // One output region holding every face — attached DOM, charts, console and the
   // error report. CSS picks which is visible from the section's state/mode, so
   // an error simply replaces whichever output was showing.
   const out = doc.createElement("div");
@@ -196,6 +196,13 @@ function expand(
   target.setAttribute("data-pg-target", "");
   while (el.firstChild) target.appendChild(el.firstChild);
   out.appendChild(target);
+
+  // Charts from any language land here. Empty by default and CSS-hidden; shown
+  // the moment a plot is drawn into it.
+  const plots = doc.createElement("div");
+  plots.setAttribute("class", "pg-plots");
+  plots.setAttribute("data-pg-plots", "");
+  out.appendChild(plots);
 
   const consoleEl = doc.createElement("div");
   consoleEl.setAttribute("class", "pg-console");

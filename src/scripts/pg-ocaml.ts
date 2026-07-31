@@ -7,9 +7,16 @@
 // `importScripts`, which module workers do not have. And a snippet the reader
 // edited into a non-terminating loop has to be killable, which is only possible
 // off the main thread.
+//
+// Plotting deliberately avoids js_of_ocaml's `Js` interop: that module is not
+// reliably bound in the Basthon toplevel. Instead `Plot.*` is pure OCaml that
+// writes `__PG_PLOT__` sentinel lines to stdout, which the runner peels off and
+// renders on the main thread.
 
 import type {
+  ChartKind,
   ForeignRunner,
+  PlotFn,
   RunDiagnostic,
   RunOutcome,
   Sink,
@@ -30,6 +37,9 @@ const TIMEOUT_MS = 15_000;
  */
 const OCAML_LOC = /^Lines? (\d+)(?:-(\d+))?, characters (\d+)-(\d+):/gm;
 
+/** Heads each stdout line that is really a chart request, not text output. */
+const PLOT_PREFIX = "__PG_PLOT__";
+
 interface DoneMessage {
   type: "done";
   id: number;
@@ -47,6 +57,13 @@ k.init();
 self.postMessage({ type: "ready" });
 self.onmessage = function (e) {
   var out = [], err = [];
+  // Define the Plot builtins (pure OCaml) with io muted: their value renderings
+  // should never reach the pane, and a prelude that failed to compile must not
+  // be able to abort a plain snippet.
+  if (e.data.prelude) {
+    k.io.stdout = function () {}; k.io.stderr = function () {};
+    try { k.exec(e.data.prelude); } catch (ex) {}
+  }
   k.io.stdout = function (s) { out.push(s); };
   k.io.stderr = function (s) { err.push(s); };
   var result = "";
@@ -58,6 +75,27 @@ self.onmessage = function (e) {
   });
 };
 `;
+
+/**
+ * Defines `Plot.bar/line/scatter` in the toplevel. Each takes plain OCaml lists,
+ * JSON-encodes them here, and writes a single `__PG_PLOT__<kind>[json]` line to
+ * stdout. `%g` keeps numbers valid as JSON (no trailing dot); `%S` quotes label
+ * strings in a JSON-compatible way for the common cases. The kind sits directly
+ * ahead of the JSON's opening `[`, so the runner can split the two without a
+ * delimiter that would need escaping.
+ */
+const PRELUDE = [
+  'let __pg_emit kind json = print_endline ("' + PLOT_PREFIX +
+  '" ^ kind ^ json);;',
+  'let __pg_num v = Printf.sprintf "%g" v;;',
+  'let __pg_json_pairs labels values = "[" ^ String.concat "," (List.map2 (fun l v -> Printf.sprintf "[%S,%s]" l (__pg_num v)) labels values) ^ "]";;',
+  'let __pg_json_xy xs ys = "[" ^ String.concat "," (List.map2 (fun x y -> Printf.sprintf "[%s,%s]" (__pg_num x) (__pg_num y)) xs ys) ^ "]";;',
+  "module Plot = struct",
+  '  let bar ~labels ~values = __pg_emit "bar" (__pg_json_pairs labels values)',
+  '  let line xs ys = __pg_emit "line" (__pg_json_xy xs ys)',
+  '  let scatter xs ys = __pg_emit "scatter" (__pg_json_xy xs ys)',
+  "end;;",
+].join("\n");
 
 /**
  * Split the compiler's report into one diagnostic per location header, each
@@ -77,11 +115,30 @@ function parseDiagnostics(stderr: string): RunDiagnostic[] {
   }));
 }
 
-function report(msg: DoneMessage, sink: Sink): RunOutcome {
-  // stdout arrives as raw write chunks; the output pane is line-oriented.
+function report(
+  msg: DoneMessage,
+  sink: Sink,
+  plot?: PlotFn,
+): RunOutcome {
   const lines = msg.stdout.split("\n");
   if (lines.at(-1) === "") lines.pop();
-  for (const line of lines) sink.log(line);
+  for (const line of lines) {
+    // A plot request hiding in stdout: kind runs up to the JSON's first `[`,
+    // the rest is the data. Rendered on the main thread, kept out of the pane.
+    if (line.startsWith(PLOT_PREFIX)) {
+      const rest = line.slice(PLOT_PREFIX.length);
+      const lb = rest.indexOf("[");
+      if (lb > 0 && plot) {
+        try {
+          plot(rest.slice(0, lb) as ChartKind, JSON.parse(rest.slice(lb)));
+        } catch (err) {
+          console.error("[playground] ocaml plot failed", err);
+        }
+      }
+      continue;
+    }
+    sink.log(line);
+  }
 
   const result = msg.result.trim();
   // A *runtime* exception is not written to stderr — the toplevel renders it as
@@ -140,7 +197,7 @@ export function createRunner(): ForeignRunner {
       return ready;
     },
 
-    run(source: string, sink: Sink): Promise<RunOutcome> {
+    run(source: string, sink: Sink, plot?: PlotFn): Promise<RunOutcome> {
       const w = worker;
       if (!w) return Promise.reject(new Error("OCaml kernel not loaded"));
 
@@ -154,7 +211,7 @@ export function createRunner(): ForeignRunner {
           if (e.data.type !== "done" || e.data.id !== id) return;
           clearTimeout(timer);
           w.removeEventListener("message", onDone);
-          resolve(report(e.data, sink));
+          resolve(report(e.data, sink, plot));
         };
         const timer = setTimeout(() => {
           w.removeEventListener("message", onDone);
@@ -167,7 +224,7 @@ export function createRunner(): ForeignRunner {
         }, TIMEOUT_MS);
 
         w.addEventListener("message", onDone);
-        w.postMessage({ id, code });
+        w.postMessage({ id, prelude: PRELUDE, code });
       });
     },
   };

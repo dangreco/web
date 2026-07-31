@@ -19,3 +19,17 @@ it.
 ## TypeScript
 
 <div data-pg-embed snippet="ts-hover"></div>
+
+## Plots
+
+### OCaml
+
+<div data-pg-embed snippet="ocaml-plot" entry="main.ml"></div>
+
+### ClojureScript
+
+<div data-pg-embed snippet="clojure-plot" entry="main.cljs"></div>
+
+### TypeScript
+
+<div data-pg-embed snippet="ts-plot"></div>

@@ -8,7 +8,13 @@
 // _config.ts: a build-time `import` of a non-esm.sh URL would be fetched and
 // inlined into the bundle by Lume's esbuild.
 
-import type { ForeignRunner, RunOutcome, Sink } from "./pg-types.ts";
+import type {
+  ChartKind,
+  ForeignRunner,
+  PlotFn,
+  RunOutcome,
+  Sink,
+} from "./pg-types.ts";
 
 const SCITTLE_URL =
   "https://cdn.jsdelivr.net/npm/scittle@0.8.32/dist/scittle.js";
@@ -35,6 +41,20 @@ const SCI_COLUMN = /:column (\d+)/;
  * devtools, not in a reader's output pane.
  */
 const PATCHED = ["log", "info", "warn", "debug"] as const;
+
+// Where the runtime installs the chart sink for the duration of an evaluation;
+// the prelude's `bar`/`line`/`scatter` reach it through `js/__pgPlot`.
+const host = globalThis as unknown as {
+  __pgPlot?: (kind: ChartKind, data: string) => void;
+};
+
+// Defines `bar`/`line`/`scatter` in the shared sci context. Each hands its
+// argument to the host as JS-then-JSON, so any Clojure data shape the renderer
+// accepts is fair game.
+const PRELUDE = "(do" +
+  ' (def bar (fn [d] (js/__pgPlot "bar" (js/JSON.stringify (cljs.core/clj->js d)))))' +
+  ' (def line (fn [d] (js/__pgPlot "line" (js/JSON.stringify (cljs.core/clj->js d)))))' +
+  ' (def scatter (fn [d] (js/__pgPlot "scatter" (js/JSON.stringify (cljs.core/clj->js d))))))';
 
 // One interpreter per page, not per section: scittle installs itself on a global
 // and there is nothing to gain from a second copy.
@@ -102,17 +122,27 @@ export function createRunner(): ForeignRunner {
     async load(): Promise<void> {
       await ensureScittle();
     },
-
-    async run(source: string, sink: Sink): Promise<RunOutcome> {
+    async run(source: string, sink: Sink, plot?: PlotFn): Promise<RunOutcome> {
       const scittle = await ensureScittle();
       const saved = PATCHED.map((level) => console[level]);
       for (const level of PATCHED) console[level] = sink[level];
+      // Expose the chart sink as a JS global for the prelude's `bar`/`line`/
+      // `scatter`; restored alongside the console in `finally`.
+      const prevPlot = host.__pgPlot;
+      if (plot) {
+        host.__pgPlot = (kind, json) => {
+          try {
+            plot(kind, JSON.parse(json));
+          } catch (err) {
+            console.error("[playground] clojure plot failed", err);
+          }
+        };
+      }
       try {
-        // Evaluates every form and hands back the last one's value. sci exposes
-        // one global context, so `def`s outlive a run and are visible to other
-        // snippets on the page; each Run re-evaluates its own source top to
-        // bottom, which re-establishes its own definitions, so that is benign.
-        const value = scittle.core.eval_string(source);
+        // The prelude re-establishes the chart vars; then the source runs in the
+        // same context. sci shares one global namespace across snippets, so a
+        // `def` in one is visible to another, but each Run redefines its own.
+        const value = scittle.core.eval_string(`${PRELUDE}\n${source}`);
         if (value !== null && value !== undefined) sink.log(String(value));
         return { ok: true, diagnostics: [] };
       } catch (err) {
@@ -121,6 +151,7 @@ export function createRunner(): ForeignRunner {
         PATCHED.forEach((level, i) => {
           console[level] = saved[i];
         });
+        host.__pgPlot = prevPlot;
       }
     },
   };

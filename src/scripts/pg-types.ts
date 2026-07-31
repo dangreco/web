@@ -30,12 +30,20 @@ export interface RunOutcome {
   diagnostics: RunDiagnostic[];
 }
 
+/** Chart kinds the runtime can draw. */
+export type ChartKind = "bar" | "line" | "scatter";
+
+/** Hands a drawn chart to the runtime, which renders it into the plot pane. */
+export type PlotFn = (kind: ChartKind, data: unknown) => void;
+
 /**
  * A non-TypeScript evaluator. `load()` is idempotent and pulls the language's
  * runtime off a CDN; `run()` evaluates one source string and reports what the
- * editor should show.
+ * editor should show. `plot`, when set, is called whenever the source asks for a
+ * chart — OCaml reaches it through the worker bridge, Clojure through a host
+ * global.
  */
 export interface ForeignRunner {
   load(): Promise<void>;
-  run(source: string, sink: Sink): Promise<RunOutcome>;
+  run(source: string, sink: Sink, plot?: PlotFn): Promise<RunOutcome>;
 }
