@@ -4,33 +4,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="supported-color-schemes" content="light dark">
   <link rel="stylesheet" href="/styles.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
-  >
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/progressive-image.js/dist/progressive-image.css"
-  >
-  <script
-    src="https://cdn.jsdelivr.net/npm/progressive-image.js/dist/progressive-image.js"
-    async
-  ></script>
   <script
     src="https://cloud.umami.is/script.js"
     data-website-id="be2af2e0-a59f-46b7-972c-c69ca2084f36"
     defer
   ></script>
   <title>dangre.co | {{ title }}</title>
+  {{ set desc = description || site.description }}
+  <meta name="description" content="{{ desc }}" />
+  <link rel="canonical" href="{{ url |> url(true) }}" />
+  <meta property="og:site_name" content="{{ site.title }}" />
+  <meta property="og:title" content="{{ title }}" />
+  <meta property="og:description" content="{{ desc }}" />
+  <meta property="og:url" content="{{ url |> url(true) }}" />
+  <meta property="og:type" content="{{ image ? 'article' : 'website' }}" />
+  <meta name="twitter:title" content="{{ title }}" />
+  <meta name="twitter:description" content="{{ desc }}" />
   {{ if image }}
     <meta property="og:image" content="{{ image |> url(true) }}" />
-    <meta property="og:title" content="{{ title }}" />
-    <meta property="og:type" content="article" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content="{{ image |> url(true) }}" />
-    <meta name="twitter:title" content="{{ title }}" />
+  {{ else }}
+    <meta name="twitter:card" content="summary" />
   {{ /if }}
   <script>
     function setTheme() {

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
-  {{ await comp.meta.head({ title, image }) }}
-  <body class="min-h-screen bg-paper text-ink font-sans flex flex-col">
+  {{ await comp.meta.head({ title, url, description, image }) }}
+  <body class="min-h-[100dvh] bg-paper text-ink font-sans flex flex-col">
     {{ await comp.layout.header() }}
     <main class="flex-1">
       <article class="mx-auto max-w-[720px] px-6 lg:px-10 py-16 lg:py-24">
@@ -25,11 +25,11 @@
           <img
             src="{{ image }}"
             alt="{{ title }}"
-            class="w-full rounded-md mb-10"
+            class="w-full rounded-chrome mb-10"
           />
         {{ /if }}
         <div
-          class="prose max-w-none prose-headings:font-display prose-headings:font-semibold prose-headings:tracking-[-0.015em] prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-code:font-mono prose-img:rounded-md"
+          class="prose max-w-none prose-headings:font-display prose-headings:font-semibold prose-headings:tracking-[-0.015em] prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-code:font-mono prose-img:rounded-chrome"
         >
           {{ content }}
         </div>

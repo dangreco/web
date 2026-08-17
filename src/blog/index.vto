@@ -1,5 +1,5 @@
 ---
-title: Writing
+title: Notes
 layout: layouts/main.vto
 ---
 
@@ -9,13 +9,12 @@ layout: layouts/main.vto
   <div
     class="mx-auto max-w-[1200px] px-6 lg:px-10 pt-16 pb-14 lg:pt-24 lg:pb-20"
   >
-    <div class="flex items-center justify-between gap-3 mb-8">
-      <div class="eyebrow mb-3">02 / Notes</div>
+    <div class="flex items-center justify-end gap-3 mb-8">
       <a
         href="/blog.rss"
         type="application/rss+xml"
         aria-label="RSS feed"
-        class="group inline-flex items-center gap-1.5 rounded-full border border-rule px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.12em] text-ink-mute hover:text-ink hover:border-rule-strong transition-colors"
+        class="group inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.12em] text-ink-mute hover:text-ink transition-colors"
       >
         <svg
           viewBox="0 0 24 24"
@@ -37,7 +36,7 @@ layout: layouts/main.vto
     <h1
       class="font-display font-semibold tracking-[-0.025em] text-[clamp(2.5rem,6vw,4.75rem)] leading-[0.95] text-ink text-balance max-w-[18ch]"
     >
-      Field notes.
+      Notes
     </h1>
     <p class="mt-6 max-w-[56ch] text-[16px] leading-[1.6] text-ink-soft">
       Build logs and technical notes, mostly backend systems, infrastructure,
@@ -55,7 +54,7 @@ layout: layouts/main.vto
         <li>
           <a
             href="{{ post.url }}"
-            class="group grid grid-cols-1 md:grid-cols-[80px_1fr_180px] gap-4 md:gap-10 py-8 md:py-10 rule-top first:border-t-0 hover:bg-panel/40 transition-colors -mx-3 px-3"
+            class="group grid grid-cols-1 md:grid-cols-[80px_1fr] gap-4 md:gap-10 py-8 md:py-10 rule-top first:border-t-0 hover:bg-panel/40 transition-colors -mx-3 px-3"
           >
             <span class="index-num pt-2">{{ n < 10 ? `0${n}` : n }}</span>
             <div>
@@ -82,16 +81,11 @@ layout: layouts/main.vto
                 </p>
               {{ /if }}
             </div>
-            <div
-              class="hidden md:flex items-start justify-end pt-3 text-ink-mute group-hover:text-accent transition-colors text-[13px] font-medium"
-            >
-              Read post →
-            </div>
           </a>
         </li>
       {{ /for }}
     </ul>
   {{ else }}
-    <p class="text-ink-mute">No posts yet. Check back soon.</p>
+    <p class="text-ink-mute">Nothing published yet.</p>
   {{ /if }}
 </section>
