@@ -340,7 +340,8 @@ code[data-line-numbers="false"] .line::before {
 
 /* Working: a breathing dot. */
 @keyframes pg-pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
     transform: scale(1);
   }
@@ -360,7 +361,8 @@ code[data-line-numbers="false"] .line::before {
     transform: scale(1);
     opacity: 0.5;
   }
-  70%, 100% {
+  70%,
+  100% {
     transform: scale(2.8);
     opacity: 0;
   }
@@ -376,7 +378,8 @@ code[data-line-numbers="false"] .line::before {
 
 /* Failed: two quick flashes, then hold. */
 @keyframes pg-flash {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -731,7 +734,8 @@ code[data-line-numbers="false"] .line::before {
     transform: scale(0.96);
     opacity: 0.5;
   }
-  70%, 100% {
+  70%,
+  100% {
     transform: scale(1.12);
     opacity: 0;
   }
@@ -755,7 +759,8 @@ code[data-line-numbers="false"] .line::before {
   }
 }
 @keyframes pgf-shake {
-  0%, 100% {
+  0%,
+  100% {
     border-color: currentColor;
   }
   50% {

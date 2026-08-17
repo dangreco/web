@@ -76,9 +76,7 @@ layout: layouts/main.vto
         <div class="p-4">
           <dt class="index-num mb-2">GPG signature</dt>
           <dd class="font-mono leading-[1.6] text-ink-soft">
-            <a href="{{ resume.signature.href }}" class="link-accent">{{
-              resume.signature.name
-            }}</a>
+            <a href="{{ resume.signature.href }}" class="link-accent">{{ resume.signature.name }}</a>
           </dd>
         </div>
         <div class="p-4">
@@ -93,9 +91,7 @@ layout: layouts/main.vto
                 class="link-accent inline-block mt-2"
               >{{ resume.checksums.name }}</a>
             {{ else }}
-              <a href="{{ resume.checksums.href }}" class="link-accent">{{
-                resume.checksums.name
-              }}</a>
+              <a href="{{ resume.checksums.href }}" class="link-accent">{{ resume.checksums.name }}</a>
             {{ /if }}
           </dd>
         </div>
