@@ -5,6 +5,7 @@
   --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --radius-chrome: 0.25rem;
 
   --color-paper: var(--paper);
   --color-ink: var(--ink);
@@ -22,10 +23,10 @@
   --paper: oklch(0.965 0.012 85); /* warm off-white */
   --ink: oklch(0.19 0.012 60); /* deep charcoal ink, faintly warm */
   --ink-soft: oklch(0.36 0.012 60); /* body copy */
-  --ink-mute: oklch(0.56 0.01 60); /* meta text */
+  --ink-mute: oklch(0.50 0.01 60); /* meta text */
   --rule: oklch(0.19 0.012 60 / 0.12); /* hairlines */
   --rule-strong: oklch(0.19 0.012 60 / 0.85);
-  --accent: oklch(0.585 0.198 32); /* vermilion */
+  --accent: oklch(0.53 0.198 32); /* vermilion */
   --accent-ink: oklch(0.98 0.01 85); /* text on accent */
   --panel: oklch(0.93 0.014 85); /* subtle tinted panel */
   /* Editor syntax tokens — the bespoke "Ember" palette, shared with the
@@ -33,7 +34,7 @@
      statically highlighted code blocks are identical. All-warm arc: vermilion
      keywords (the accent verbatim), amber types, olive strings. */
   --syn-comment: #a0968f;
-  --syn-keyword: #d83b21;
+  --syn-keyword: #c42405;
   --syn-string: #626a09;
   --syn-const: #b45000;
   --syn-type: #9f6200;
@@ -47,7 +48,7 @@
     --paper: oklch(0.16 0.01 60);
     --ink: oklch(0.96 0.008 85);
     --ink-soft: oklch(0.82 0.008 85);
-    --ink-mute: oklch(0.6 0.01 85);
+    --ink-mute: oklch(0.65 0.01 85);
     --rule: oklch(0.96 0.008 85 / 0.14);
     --rule-strong: oklch(0.96 0.008 85 / 0.85);
     --accent: oklch(0.7 0.185 38);
@@ -66,7 +67,7 @@ body[data-color="dark"] {
   --paper: oklch(0.16 0.01 60);
   --ink: oklch(0.96 0.008 85);
   --ink-soft: oklch(0.82 0.008 85);
-  --ink-mute: oklch(0.6 0.01 85);
+  --ink-mute: oklch(0.65 0.01 85);
   --rule: oklch(0.96 0.008 85 / 0.14);
   --rule-strong: oklch(0.96 0.008 85 / 0.85);
   --accent: oklch(0.7 0.185 38);
@@ -86,11 +87,11 @@ body[data-color="light"] {
   --ink-mute: oklch(0.56 0.01 60);
   --rule: oklch(0.19 0.012 60 / 0.12);
   --rule-strong: oklch(0.19 0.012 60 / 0.85);
-  --accent: oklch(0.585 0.198 32);
+  --accent: oklch(0.53 0.198 32);
   --accent-ink: oklch(0.98 0.01 85);
   --panel: oklch(0.93 0.014 85);
   --syn-comment: #a0968f;
-  --syn-keyword: #d83b21;
+  --syn-keyword: #c42405;
   --syn-string: #626a09;
   --syn-const: #b45000;
   --syn-type: #9f6200;
@@ -160,6 +161,12 @@ body[data-color="light"] {
   --tw-prose-td-borders: var(--color-rule);
 }
 
+/* Typography ships .prose pre with its own 0.375rem; one radius scale means
+   the static shiki blocks and the .pg playground chrome read as one surface. */
+.prose pre {
+  border-radius: var(--radius-chrome);
+}
+
 @utility link-accent {
   color: var(--color-accent);
   text-decoration: underline;
@@ -201,13 +208,12 @@ code[data-line-numbers="false"] .line::before {
   width: 0;
   margin-right: 0;
 }
-
 /* Interactive playground chrome. Matches the .shiki container language
-   (panel bg, --color-rule hairline, 0.375rem radius) and flips with the theme
-   via the palette variables. */
+   (panel bg, --color-rule hairline, the shared --radius-chrome token) and
+   flips with the theme via the palette variables. */
 .pg {
   border: 1px solid var(--color-rule);
-  border-radius: 0.375rem;
+  border-radius: var(--radius-chrome);
   overflow: hidden;
   background: var(--color-panel);
   transition: background-color 150ms, border-color 150ms;
@@ -233,7 +239,7 @@ code[data-line-numbers="false"] .line::before {
   border: none;
   cursor: pointer;
   padding: 0.15rem 0.4rem;
-  border-radius: 0.25rem;
+  border-radius: var(--radius-chrome);
   color: var(--color-ink-mute);
   transition: color 120ms, background-color 120ms;
 }
@@ -254,7 +260,7 @@ code[data-line-numbers="false"] .line::before {
   padding: 0.15rem;
   background: none;
   border: none;
-  border-radius: 0.25rem;
+  border-radius: var(--radius-chrome);
   color: var(--color-ink-mute);
   cursor: pointer;
   flex: none;
@@ -525,7 +531,7 @@ code[data-line-numbers="false"] .line::before {
 .pg-editor .cm-tooltip {
   background: var(--color-panel);
   border: 1px solid var(--color-rule-strong);
-  border-radius: 0.25rem;
+  border-radius: var(--radius-chrome);
   color: var(--color-ink);
   font-family: var(--font-mono);
   font-size: 0.75rem;
@@ -630,7 +636,7 @@ code[data-line-numbers="false"] .line::before {
   padding: 0.2rem 0.45rem;
   background: var(--color-ink);
   color: var(--color-panel);
-  border-radius: 0.25rem;
+  border-radius: var(--radius-chrome);
   font-family: var(--font-mono);
   font-size: 11px;
   white-space: pre;
@@ -670,7 +676,7 @@ code[data-line-numbers="false"] .line::before {
   padding: 0.3rem 0.75rem;
   min-width: 74px;
   border: 1px solid var(--color-rule-strong);
-  border-radius: 0.375rem;
+  border-radius: var(--radius-chrome);
   background: var(--color-panel);
   color: var(--color-ink);
   font-family: var(--font-mono);
@@ -715,7 +721,7 @@ code[data-line-numbers="false"] .line::before {
   content: "";
   position: absolute;
   inset: -3px;
-  border-radius: 0.5rem;
+  border-radius: 0.4375rem;
   border: 1px solid currentColor;
   opacity: 0;
   animation: pgf-ping 1.6s cubic-bezier(0, 0, 0.2, 1) infinite;
@@ -833,7 +839,7 @@ code[data-line-numbers="false"] .line::before {
   padding: 0.25rem 0.6rem;
   margin: 0 0.35rem 0 0;
   border: 1px solid var(--color-rule-strong);
-  border-radius: 0.25rem;
+  border-radius: var(--radius-chrome);
   background: var(--color-panel);
   color: var(--color-ink);
   cursor: pointer;

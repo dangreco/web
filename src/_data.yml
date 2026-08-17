@@ -1,0 +1,7 @@
+---
+# yamllint disable rule:line-length
+# yamllint disable rule:comments
+site:
+  title: Dan Greco
+  description: >-
+    Software engineer in Toronto working on backend systems, infrastructure, and developer tooling. On the side, home automation, 3D printing, and the occasional PCB.

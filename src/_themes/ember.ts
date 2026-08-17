@@ -6,7 +6,7 @@
 // Keep these hexes in sync with the --syn-* variables in src/styles.css, which
 // colour the live editor. Values are generated from OKLCH so the light and dark
 // variants are perceptually matched:
-//   keyword = --accent verbatim   oklch(0.585 0.198 32) / oklch(0.7 0.185 38)
+//   keyword = --accent verbatim   oklch(0.53 0.198 32) / oklch(0.7 0.185 38)
 //   type    oklch(0.55 0.13 72)  / oklch(0.82 0.12 78)
 //   string  oklch(0.5  0.11 115) / oklch(0.8  0.11 118)
 //   number  oklch(0.55 0.15 50)  / oklch(0.8  0.14 55)
@@ -29,9 +29,9 @@ interface Palette {
 const LIGHT: Palette = {
   fg: "#18130e",
   bg: "#ece7de",
-  mute: "#79736f",
+  mute: "#68625e",
   comment: "#a0968f",
-  keyword: "#d83b21",
+  keyword: "#c42405",
   str: "#626a09",
   num: "#b45000",
   type: "#9f6200",
@@ -40,7 +40,7 @@ const LIGHT: Palette = {
 const DARK: Palette = {
   fg: "#f4f1ec",
   bg: "#1e1a16",
-  mute: "#83807a",
+  mute: "#928f88",
   comment: "#6d685f",
   keyword: "#fb6c3e",
   str: "#b7c874",

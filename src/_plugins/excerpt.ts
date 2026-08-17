@@ -36,13 +36,6 @@ function apply(
     if (node.type === "text") {
       parts.push(node.value);
     }
-
-    // Optional: keep link text but not URLs
-    if (node.type === "link") {
-      visit(node, (node_) => {
-        if (node_.type === "text") parts.push(node_.value);
-      });
-    }
   });
 
   const lang = page.data.lang || options.lang;

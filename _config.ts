@@ -13,6 +13,7 @@ import { enCA } from "npm:date-fns@4.1.0/locale/en-CA";
 import { frCA } from "npm:date-fns@4.1.0/locale/fr-CA";
 import { format as dfFormat } from "lume/deps/date.ts";
 import katex from "lume/plugins/katex.ts";
+import googleFonts from "lume/plugins/google_fonts.ts";
 
 import excerpt from "./src/_plugins/excerpt.ts";
 import playground from "./src/_plugins/playground.ts";
@@ -75,6 +76,16 @@ site.use(
   }),
 );
 
+// Self-hosted from the same Google source the <link> used to fetch at runtime:
+// downloaded once at build time into /fonts, so no third-party origin sits on
+// the critical path. Latin only; the site is lang="en".
+site.use(
+  googleFonts({
+    fonts:
+      "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500",
+    subsets: ["latin"],
+  }),
+);
 site.use(tailwindcss());
 site.use(postcss());
 // Snippet .ts files are browser-run (bundled in-page by esbuild-wasm), not

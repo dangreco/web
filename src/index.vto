@@ -1,5 +1,5 @@
 ---
-title: Home
+title: Index
 layout: layouts/main.vto
 ---
 
@@ -18,9 +18,6 @@ layout: layouts/main.vto
     class="relative z-20 mx-auto max-w-[1200px] px-6 lg:px-10 pt-16 pb-20 lg:pt-24 lg:pb-28 pointer-events-none"
   >
     <div class="max-w-[80ch]">
-      <div class="flex items-center gap-3 mb-8 max-w-[520px]">
-        <div class="eyebrow mb-3">01 / Index</div>
-      </div>
       <h1
         class="font-display font-semibold tracking-[-0.025em] text-[clamp(2.75rem,7vw,5.75rem)] leading-[0.95] text-ink text-balance"
       >
@@ -41,12 +38,6 @@ layout: layouts/main.vto
           Read the blog
           <span aria-hidden>→</span>
         </a>
-        <a
-          href="/resume"
-          class="inline-flex items-center gap-2 h-11 px-5 border border-rule-strong text-ink text-[13px] font-medium hover:border-accent hover:text-accent transition-colors"
-        >
-          Résumé
-        </a>
       </div>
     </div>
   </div>
@@ -56,7 +47,7 @@ layout: layouts/main.vto
 <section id="work" class="mx-auto max-w-[1200px] px-6 lg:px-10 py-20 lg:py-28">
   <div class="flex items-end justify-between gap-6 rule-bottom pb-4">
     <div>
-      <div class="eyebrow mb-3">02 / Open Source</div>
+      <div class="eyebrow mb-3">Open Source</div>
       <h2
         class="font-display text-[28px] md:text-[36px] font-semibold tracking-[-0.02em] text-ink"
       >
@@ -68,7 +59,7 @@ layout: layouts/main.vto
         href="https://github.com/dangreco"
         class="link-accent text-[13px] font-medium"
       >
-        View all on GitHub →
+        View all on GitHub
       </a>
     </div>
   </div>
@@ -100,7 +91,6 @@ layout: layouts/main.vto
               <span
                 class="font-display text-[20px] md:text-[22px] font-semibold text-ink group-hover:text-accent transition-colors truncate"
               >{{ repo.name }}</span>
-              <span aria-hidden class="hidden md:inline text-ink-mute">↗</span>
             </div>
             {{ if repo.description }}
               <p
@@ -173,7 +163,7 @@ layout: layouts/main.vto
   <div class="mx-auto max-w-[1200px] px-6 lg:px-10 py-20 lg:py-24">
     <div class="flex items-end justify-between gap-6 rule-bottom pb-4">
       <div>
-        <div class="eyebrow mb-3">03 / Notebook</div>
+        <div class="eyebrow mb-3">Notebook</div>
         <h2
           class="font-display text-[28px] md:text-[36px] font-semibold tracking-[-0.02em] text-ink"
         >
@@ -182,7 +172,7 @@ layout: layouts/main.vto
       </div>
       <div class="pb-1">
         <a href="/blog" class="link-accent text-[13px] font-medium"
-        >All posts →</a>
+        >All posts</a>
       </div>
     </div>
     <ul class="mt-10 grid gap-px bg-rule border border-rule">
@@ -192,7 +182,7 @@ layout: layouts/main.vto
         <li class="bg-paper">
           <a
             href="{{ post.url }}"
-            class="group grid grid-cols-1 md:grid-cols-[64px_1fr_140px] gap-4 md:gap-8 p-6 md:p-8 hover:bg-panel/40 transition-colors"
+            class="group grid grid-cols-1 md:grid-cols-[64px_1fr] gap-4 md:gap-8 p-6 md:p-8 hover:bg-panel/40 transition-colors"
           >
             <span class="index-num pt-1">{{ p < 10 ? `0${p}` : p }}</span>
             <div>
@@ -219,11 +209,6 @@ layout: layouts/main.vto
                 </p>
               {{ /if }}
             </div>
-            <div
-              class="hidden md:flex items-start justify-end pt-2 text-ink-mute group-hover:text-accent transition-colors"
-            >
-              Read →
-            </div>
           </a>
         </li>
       {{ /for }}
@@ -235,7 +220,7 @@ layout: layouts/main.vto
 <section class="mx-auto max-w-[1200px] px-6 lg:px-10 py-20 lg:py-24">
   <div class="flex items-end justify-between gap-6 rule-bottom pb-4">
     <div>
-      <div class="eyebrow mb-3">04 / Credentials</div>
+      <div class="eyebrow mb-3">Credentials</div>
       <h2
         class="font-display text-[28px] md:text-[36px] font-semibold tracking-[-0.02em] text-ink"
       >

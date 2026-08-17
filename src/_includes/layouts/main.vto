@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
-  {{ await comp.meta.head({ title }) }}
-  <body class="min-h-screen bg-paper text-ink font-sans flex flex-col">
+  {{ await comp.meta.head({ title, url, description }) }}
+  <body class="min-h-[100dvh] bg-paper text-ink font-sans flex flex-col">
     {{ await comp.layout.header() }}
     <main class="flex-1">
       {{ content }}
