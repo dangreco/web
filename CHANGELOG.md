@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.6.1](https://github.com/dangreco/web/compare/v0.6.0...v0.6.1) (2026-08-17)
+
+
+### Bug Fixes
+
+* ui fixes ([#44](https://github.com/dangreco/web/issues/44)) ([711a697](https://github.com/dangreco/web/commit/711a697ad3a6fd5eb19b605547f4266e35d3d600))
+
+
+### Dependencies
+
+* **deps:** bump actions/attest-build-provenance from 4.1.1 to 4.2.2 ([#43](https://github.com/dangreco/web/issues/43)) ([7efc19a](https://github.com/dangreco/web/commit/7efc19aaf8996848d440c01122cdcd3351c83814))
+* **deps:** bump docker/login-action from 4.5.1 to 4.6.0 ([#42](https://github.com/dangreco/web/issues/42)) ([768d5be](https://github.com/dangreco/web/commit/768d5be9f8b11f6003e575bf52ef8d220328212b))
+
 ## [0.6.0](https://github.com/dangreco/web/compare/v0.5.0...v0.6.0) (2026-07-31)
 
 
