@@ -17,6 +17,8 @@ import googleFonts from "lume/plugins/google_fonts.ts";
 
 import excerpt from "./src/_plugins/excerpt.ts";
 import playground from "./src/_plugins/playground.ts";
+import series from "./src/_plugins/series.ts";
+import toc from "./src/_plugins/toc.ts";
 import { emberDark, emberLight } from "./src/_themes/ember.ts";
 
 const site = lume({
@@ -171,6 +173,8 @@ site.filter("date", (value: unknown, pattern = "DATE", lang = "enCA") => {
 });
 
 site.use(excerpt({ length: 30 }));
+site.use(series());
+site.use(toc());
 site.use(playground());
 
 site.use(
@@ -191,5 +195,6 @@ site.use(
 site.copy("assets");
 site.add("/styles.css");
 site.add("/scripts/playground.ts");
+site.add("/scripts/toc.ts");
 
 export default site;
