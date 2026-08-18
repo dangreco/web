@@ -1,0 +1,19 @@
+<div class="toc relative" data-toc>
+  {{# Sized and moved by /scripts/toc.js; styling lives in styles.css. #}}
+  <span class="toc-marker" data-toc-marker aria-hidden="true"></span>
+  <ol>
+    {{ set n = 0 }}
+    {{ for h of headings }}
+      {{ set n = n + 1 }}
+      <li>
+        <a
+          href="#{{ h.id }}"
+          class="flex gap-3 py-2 pl-3 border-l border-rule text-[13px] leading-[1.45] text-ink-soft transition-colors hover:text-ink hover:border-ink-mute/50"
+        >
+          <span class="index-num pt-[3px] shrink-0">{{ n < 10 ? `0${n}` : n }}</span>
+          <span class="min-w-0">{{ h.text }}</span>
+        </a>
+      </li>
+    {{ /for }}
+  </ol>
+</div>

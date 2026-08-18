@@ -1,0 +1,45 @@
+{{# Sticky on the grid item itself: `self-start` keeps the box at content
+height so it has room to travel inside its (full-height) grid area, and the
+max-height keeps a long list reachable instead of running off the viewport. #}}
+<div
+  class="mb-10 lg:mb-0 lg:sticky lg:top-[5.5rem] lg:self-start lg:max-h-[calc(100dvh-7rem)] lg:overflow-y-auto"
+>
+  <details class="post-nav-picker group lg:hidden rounded-chrome border border-rule bg-panel/40">
+    <summary
+      class="flex items-center justify-between gap-3 px-4 py-3 cursor-pointer list-none"
+    >
+      <span class="min-w-0">
+        <span class="eyebrow block">On this page</span>
+        <span class="block text-[13px] text-ink mt-1">
+          {{ headings.length }} sections
+        </span>
+      </span>
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="h-4 w-4 shrink-0 text-ink-mute transition-transform group-open:rotate-180"
+        aria-hidden="true"
+      >
+        <path d="m6 9 6 6 6-6"></path>
+      </svg>
+    </summary>
+    <nav aria-label="Table of contents" class="px-4 pb-4 pt-3 rule-top">
+      {{ await comp.blog.tocList({ headings }) }}
+    </nav>
+  </details>
+
+  <nav aria-label="Table of contents" class="hidden lg:block">
+    <p class="eyebrow">On this page</p>
+    <p class="font-mono tabular-nums text-[12px] text-ink-mute mt-1 mb-4">
+      {{ headings.length }} sections
+    </p>
+    {{ await comp.blog.tocList({ headings }) }}
+  </nav>
+</div>
+
+{{# Scroll-spy: only shipped on pages that actually render a TOC. #}}
+<script type="module" src="/scripts/toc.js"></script>

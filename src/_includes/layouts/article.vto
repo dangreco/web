@@ -4,8 +4,24 @@
   <body class="min-h-[100dvh] bg-paper text-ink font-sans flex flex-col">
     {{ await comp.layout.header() }}
     <main class="flex-1">
-      <article class="mx-auto max-w-[720px] px-6 lg:px-10 py-16 lg:py-24">
-        <header class="rule-bottom pb-8 mb-10">
+      {{ set tocResult = content |> toc }}
+      {{ set isSeries = seriesTotal > 1 }}
+      {{ set hasToc = tocResult.headings.length > 1 }}
+      {{ set prevPart = isSeries && part > 1 ? seriesParts[part - 2] : null }}
+      {{ set nextPart = isSeries && part < seriesTotal ? seriesParts[part] : null }}
+      <div
+        class="{{ hasToc ? 'mx-auto max-w-[1200px] px-6 lg:px-10 py-16 lg:py-24 lg:grid lg:grid-cols-[minmax(0,220px)_minmax(0,720px)] lg:gap-16 lg:justify-center' : 'mx-auto max-w-[720px] px-6 lg:px-10 py-16 lg:py-24' }}"
+      >
+        {{ if hasToc }}
+          {{ await comp.blog.postToc({ headings: tocResult.headings }) }}
+        {{ /if }}
+        <article class="min-w-0">
+          <header class="rule-bottom pb-8 mb-10">
+            {{ if isSeries }}
+              <p class="eyebrow mb-3">
+                {{ seriesTitle }} · Part {{ part }} of {{ seriesTotal }}
+              </p>
+            {{ /if }}
           {{ if date }}
             <div class="flex items-center gap-3 text-[12px] text-ink-mute mb-5">
               <span class="font-mono tabular-nums">{{ date |> date }}</span>
@@ -31,9 +47,43 @@
         <div
           class="prose max-w-none prose-headings:font-display prose-headings:font-semibold prose-headings:tracking-[-0.015em] prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-code:font-mono prose-img:rounded-chrome"
         >
-          {{ content }}
+          {{ tocResult.html }}
         </div>
+        {{ if isSeries }}
+          <nav
+            aria-label="Series navigation"
+            class="mt-16 pt-8 rule-top flex flex-col sm:flex-row gap-4 sm:justify-between"
+          >
+            {{ if prevPart }}
+              <a
+                href="{{ prevPart.url }}"
+                class="group flex flex-col gap-1 rounded-chrome border border-rule px-5 py-4 transition-colors hover:border-ink-mute/50"
+              >
+                <span class="eyebrow">← Part {{ prevPart.part }}</span>
+                <span
+                  class="text-[15px] text-ink transition-colors group-hover:text-accent"
+                >
+                  {{ prevPart.title }}
+                </span>
+              </a>
+            {{ /if }}
+            {{ if nextPart }}
+              <a
+                href="{{ nextPart.url }}"
+                class="group flex flex-col gap-1 rounded-chrome border border-rule px-5 py-4 text-right transition-colors hover:border-ink-mute/50 sm:ml-auto"
+              >
+                <span class="eyebrow">Part {{ nextPart.part }} →</span>
+                <span
+                  class="text-[15px] text-ink transition-colors group-hover:text-accent"
+                >
+                  {{ nextPart.title }}
+                </span>
+              </a>
+            {{ /if }}
+          </nav>
+        {{ /if }}
       </article>
+      </div>
     </main>
     {{ await comp.layout.footer() }}
   </body>
