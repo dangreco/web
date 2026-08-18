@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.0](https://github.com/dangreco/web/compare/v0.6.1...v0.7.0) (2026-08-18)
+
+
+### Features
+
+* multi-part posts and a per-post table of contents ([#47](https://github.com/dangreco/web/issues/47)) ([e34974e](https://github.com/dangreco/web/commit/e34974e98ec94b6f2a561985ae694b0d773dcf82))
+
 ## [0.6.1](https://github.com/dangreco/web/compare/v0.6.0...v0.6.1) (2026-08-17)
 
 
